@@ -1,76 +1,59 @@
 import React from "react";
-import { Button, Typography, Stack } from "@mui/material";
-
-const actions = [
-  { label: "Register User" },
-  { label: "Choose Category" },
-  { label: "Submit Prompt" },
-  { label: "View AI Response" },
-  { label: "Learning History" },
-  { label: "Admin Panel" },
-];
+import { Box, Paper, Typography, Button, Stack } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   return (
-    <div
-      style={{
-        marginTop: 170,
+    <Box
+      sx={{
         minHeight: "100vh",
-        // background: "linear-gradient(135deg, #e3e6f3 0%, #f9fafc 100%)",
-        padding: "60px 0 0 0",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
+        justifyContent: "center",
+        px: 2,
       }}
     >
-      <Typography
-        variant="h4"
-        align="center"
-        fontWeight={700}
+      <Paper
+        elevation={0}
         sx={{
-          color: "#2d3142",
-          letterSpacing: 1,
-          mb: 4,
+          p: { xs: 3, md: 5 },
+          borderRadius: 4,
+          minWidth: { xs: 320, md: 400 },
+          maxWidth: 500,
+          background: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        Dashboard
-      </Typography>
-      <Stack
-        direction="row"
-        spacing={2}
-        justifyContent="center"
-        alignItems="flex-start"
-        sx={{ width: "100%", mt: 2 }}
-      >
-        {actions.map((action) => (
+        <Typography variant="h4" fontWeight={700} color="primary" gutterBottom>
+          ברוך הבא!
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
+          זהו עמוד הבית של האפליקציה שלך. בחר פעולה להתחלה:
+        </Typography>
+        <Stack spacing={2} sx={{ width: "100%" }}>
           <Button
-            key={action.label}
             variant="contained"
-            disableElevation
-            sx={{
-              background: "linear-gradient(90deg, #232526 0%, #414345 100%)",
-              color: "#fff",
-              fontWeight: 500,
-              fontSize: "1rem",
-              borderRadius: 2,
-              px: 3,
-              py: 1,
-              minWidth: 140,
-              boxShadow: "none",
-              textTransform: "none",
-              letterSpacing: 0.5,
-              '&:hover': {
-                background: "linear-gradient(90deg, #414345 0%, #232526 100%)",
-                boxShadow: "none",
-              },
-              transition: "background 0.3s",
-            }}
+            color="primary"
+            fullWidth
+            onClick={() => navigate("/LogIn")}
           >
-            {action.label}
+            התחברות
           </Button>
-        ))}
-      </Stack>
-    </div>
+          <Button
+            variant="outlined"
+            color="primary"
+            fullWidth
+            onClick={() => navigate("/history")}
+          >
+            היסטוריית למידה
+          </Button>
+        </Stack>
+      </Paper>
+    </Box>
   );
 };
 
