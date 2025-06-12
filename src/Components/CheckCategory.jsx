@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Box,
-  Typography,
-  Paper,
-  Stack,
-  Button,
-  CircularProgress,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
+  Box, Typography, Paper, Stack, Button, CircularProgress, Alert, FormControl,
+  InputLabel, Select, MenuItem, TextField
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCategories, getAllsubCategoriesById } from "../Redux/thunk";
+
 
 const CheckCategory = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -21,19 +14,39 @@ const CheckCategory = () => {
   const [aiResponse, setAiResponse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const categoriesList = useSelector((state) => state.category.categories);
+  const subsCategoryList = useSelector((state) => state.subCategory.subsCategories);
 
-  // נתונים מדומים לקטגוריות ותתי-קטגוריות
-  const categories = [
-    { id: 1, name: "Science" },
-    { id: 2, name: "History" },
-    { id: 3, name: "Technology" },
-  ];
+  console.log("categoriesList from Redux:", categoriesList);
+  console.log("subsCategoryList from Redux:", subsCategoryList);
 
-  const subCategoriesData = {
-    1: [{ id: 101, name: "Space" }, { id: 102, name: "Biology" }],
-    2: [{ id: 201, name: "Ancient Civilizations" }, { id: 202, name: "World Wars" }],
-    3: [{ id: 301, name: "Programming" }, { id: 302, name: "Artificial Intelligence" }],
-  };
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllCategories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      dispatch(getAllsubCategoriesById(selectedCategory));
+    }
+  }, [selectedCategory, dispatch]);
+
+  const categories =
+    categoriesList && categoriesList.length > 0
+      ? categoriesList.map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+      }))
+      : [];
+
+  const subsCategoryData =
+    subsCategoryList && subsCategoryList.length > 0
+      ? subsCategoryList.map((sub) => ({
+        id: sub.id,
+        name: sub.name,
+      }))
+      : [];
 
   const handleSubmitPrompt = async () => {
     if (!selectedCategory || !selectedSubCategory || !prompt) {
@@ -42,20 +55,17 @@ const CheckCategory = () => {
     }
     setError(null);
     setIsLoading(true);
-    setAiResponse(null); // Clear previous responses
+    setAiResponse(null);
 
     try {
-      // Simulate AI response (replace with actual API call to your backend)
       const mockApiResponse = await new Promise((resolve) =>
         setTimeout(() => {
           resolve({
-            lesson: `This is a generated lesson about "${prompt}" in the category of ${
-              categories.find((cat) => cat.id === selectedCategory)?.name
-            } > ${
-              subCategoriesData[selectedCategory]?.find(
+            lesson: `This is a generated lesson about "${prompt}" in the category of ${categories.find((cat) => cat.id === selectedCategory)?.name
+              } > ${subsCategoryData.find( // תיקון: subsCategoryData במקום subCategoriesData[selectedCategory]
                 (sub) => sub.id === selectedSubCategory
               )?.name
-            }.
+              }.
 
             The AI provides detailed information, examples, and key takeaways for a comprehensive learning experience. For example, if you asked about 'black holes', the AI might cover:
             - What are black holes?
@@ -82,7 +92,7 @@ const CheckCategory = () => {
     <Box
       sx={{
         minHeight: "100vh",
-                display: "flex",
+        display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
@@ -131,7 +141,6 @@ const CheckCategory = () => {
         )}
 
         <Stack spacing={3} sx={{ width: "100%" }}>
-          {/* CategorySelector - מיושם כאן ישירות */}
           <FormControl fullWidth>
             <InputLabel id="category-select-label">Category</InputLabel>
             <Select
@@ -140,8 +149,8 @@ const CheckCategory = () => {
               value={selectedCategory}
               label="Category"
               onChange={(e) => {
-                setSelectedCategory(e.target.value);
-                setSelectedSubCategory(""); // Reset sub-category on category change
+                setSelectedCategory(Number(e.target.value));
+                setSelectedSubCategory("");
               }}
               sx={{ borderRadius: 2 }}
             >
@@ -164,7 +173,7 @@ const CheckCategory = () => {
                 onChange={(e) => setSelectedSubCategory(e.target.value)}
                 sx={{ borderRadius: 2 }}
               >
-                {subCategoriesData[selectedCategory]?.map((subCat) => (
+                {subsCategoryData.map((subCat) => (
                   <MenuItem key={subCat.id} value={subCat.id}>
                     {subCat.name}
                   </MenuItem>
@@ -173,7 +182,6 @@ const CheckCategory = () => {
             </FormControl>
           )}
 
-          {/* PromptInput - מיושם כאן ישירות */}
           <TextField
             label="Enter your learning prompt"
             multiline
@@ -209,8 +217,6 @@ const CheckCategory = () => {
               "Get Lesson"
             )}
           </Button>
-
-          {/* LessonDisplay - מיושם כאן ישירות */}
           {aiResponse && (
             <Box sx={{ mt: 3, width: "100%" }}>
               <Typography
@@ -231,7 +237,7 @@ const CheckCategory = () => {
                   maxHeight: 400,
                   overflowY: "auto",
                   lineHeight: 1.6,
-                  whiteSpace: "pre-wrap", // Preserve whitespace and line breaks
+                  whiteSpace: "pre-wrap",
                 }}
               >
                 <Typography variant="body1" color="text.secondary">
@@ -240,9 +246,6 @@ const CheckCategory = () => {
               </Paper>
             </Box>
           )}
-
-          {/* כפתור "View My Learning History" הוסר כיוון שלא נדרש ניתוב */}
-          {/* RegisterForm הוסר כיוון שלא נדרש ניתוב */}
         </Stack>
       </Paper>
     </Box>

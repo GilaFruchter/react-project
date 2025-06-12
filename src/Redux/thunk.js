@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const getAllCustomers = createAsyncThunk(
+export const getAllusers = createAsyncThunk(
     'users/fetchData',
     async () => {
         const response = await fetch('http://localhost:5032/api/users/');
@@ -46,4 +46,36 @@ export const createNewUserAsyncAction = createAsyncThunk(
         const data = await response.json();
         return data;  
     }
+);
+
+export const getAllCategories = createAsyncThunk(
+  'category/getAll',
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetch('http://localhost:5032/api/categories');
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      const data = await response.json(); 
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
+);
+
+export const getAllsubCategoriesById = createAsyncThunk(
+  'subCategory/getAllById',
+  async (categoryId, thunkAPI) => {
+    try {
+      const response = await fetch(`http://localhost:5032/api/subcategory/subs/${categoryId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch subcategories');
+      }
+      const data = await response.json(); 
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
 );
