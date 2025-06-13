@@ -79,7 +79,6 @@ const LogIn = () => {
       const result = await dispatch(getUserById(id));
       if (getUserById.fulfilled.match(result)) {
         const user = result.payload;
-        // Clean the name from extra spaces
         const cleanName = user?.name ? user.name.trim() : "User";
         setSuccess(true);
         setMessage(`ברוך הבא, ${cleanName}!`);
@@ -181,7 +180,7 @@ const LogIn = () => {
                   variant="outlined"
                   color="secondary"
                   startIcon={<PersonAddAlt1Icon />}
-                  onClick={() => navigate("/SignUp/guest")}
+                  onClick={() => navigate("/CheckCategory/guest/000")}
                   sx={{
                     px: 3,
                     fontWeight: 700,

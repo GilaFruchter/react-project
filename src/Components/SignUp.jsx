@@ -63,7 +63,7 @@ const SignUp = () => {
       return;
     }
     const customerData = {
-      id: isNaN(Number(id)) ? id : Number(id),
+      Id: (Number(id)),
       name: firstName,
       phone: phone,
     };
@@ -72,7 +72,7 @@ const SignUp = () => {
       if (createNewUser.fulfilled.match(resultAction)) {
         setMessage('נרשמת בהצלחה!');
         await new Promise(res => setTimeout(res, 1000));
-        navigate(`/CheckCategory/${firstName.trim()}/${id}`);
+        navigate(`/CheckCategory/${firstName}/${id}`);
       } else {
         setMessage('הרשמה נכשלה: ' + (resultAction.error?.message || ''));
       }

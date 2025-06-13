@@ -9,14 +9,15 @@ import {
   List,
   ListItem,
   ListItemText,
-  Paper
+  Paper,
+  Box // ודא ש-Box מיובא
 } from "@mui/material";
 
 const LearningHistory = () => {
   const dispatch = useDispatch();
-  const { id } = useParams(); // make sure your route is /LearningHistory/:id
+  const { id } = useParams(); // ודא שהנתיב שלך ב-App.js הוא /LearningHistory/:id
 
-  // קח את הסטייט מה-slice של prompts
+  // קח את הסטייט מה-slice של prompts (או איך שקראת לו)
   const { prompts, loading, error } = useSelector((state) => state.prompt);
 
   useEffect(() => {
@@ -28,24 +29,42 @@ const LearningHistory = () => {
   return (
     <Paper sx={{ p: 3, maxWidth: 600, margin: "auto", mt: 5 }}>
       <Typography variant="h5" fontWeight={700} gutterBottom>
-        Learning History
+        היסטוריית למידה עבור משתמש: {id} {/* מציג את ID המשתמש */}
       </Typography>
-      {loading && <CircularProgress />}
+
+      {/* מצב טעינה */}
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+          <CircularProgress />
+          <Typography variant="body1" sx={{ ml: 2, color: 'text.secondary' }}>
+            טוען היסטוריה...
+          </Typography>
+        </Box>
+      )}
+
+      {/* מצב שגיאה */}
       {error && <Alert severity="error">{error}</Alert>}
-      <List>
-        {prompts && prompts.length > 0 ? (
-          prompts.map((prompt) => (
-            <ListItem key={prompt.id} divider>
-              <ListItemText
-                primary={prompt.prompt}
-                secondary={prompt.response}
-              />
-            </ListItem>
-          ))
-        ) : (
-          <Typography>No history found.</Typography>
-        )}
-      </List>
+
+      {/* הצגת רשימת הפרומפטים */}
+      {!loading && !error && (
+        <List>
+          {prompts && prompts.length > 0 ? (
+            prompts.map((promptItem) => ( // שיניתי את השם ל-promptItem למניעת בלבול עם המשתנה prompt מה-slice
+              <ListItem key={promptItem.id} divider>
+                <ListItemText
+                  primary={promptItem.prompt}
+                  secondary={promptItem.response}
+                />
+              </ListItem>
+            ))
+          ) : (
+            // הודעה כשאין נתונים, מוצגת רק אם אין טעינה ואין שגיאה
+            <Alert severity="info" sx={{ mt: 2 }}>
+              אין היסטוריה זמינה עבור משתמש זה.
+            </Alert>
+          )}
+        </List>
+      )}
     </Paper>
   );
 };

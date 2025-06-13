@@ -24,27 +24,27 @@ export const getUserById = createAsyncThunk(
     return data;
   }
 );
-
-
 export const createNewUser = createAsyncThunk(
     'customers/createNewUser',
-    async (customerData) => {
-        const response = await fetch('http://localhost:5032/api/users/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(customerData),
-        });
+    async (customerData, { rejectWithValue }) => {
+        try {
+            const response = await fetch('http://localhost:5032/api/users/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(customerData),
+            });
 
-        if (!response.ok) {
-            console.log('Response:', response);
-            const errorData = await response.json();
-            throw new Error(`Error: ${errorData.message || 'Network response was not ok'}`);
-        }        
-
-        const data = await response.json();
-        return data;  
+            if (!response.ok) {
+                const errorData = await response.json(); 
+                return rejectWithValue(errorData);
+            }
+            const data = await response.json();
+            return data; 
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
     }
 );
 
@@ -134,19 +134,3 @@ export const GetPromptById=createAsyncThunk(
     }
   }
 );
-
-//add getUserPromptsAsync
-// export const getUserPromptsAsync = createAsyncThunk(
-//   "prompts/getUserPrompts",
-//   async (userId, thunkAPI) => {
-//     try {
-//       const response = await fetch(`http://localhost:5032/api/Prompts/user/${userId}`);
-//       if (!response.ok) {
-//         throw new Error("Failed to fetch user prompts");
-//       }
-//       return await response.json();
-//     } catch (err) {
-//       return thunkAPI.rejectWithValue(err.message);
-//     }
-//   }
-// );
