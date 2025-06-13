@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getUserById } from "./thunk";
+import { getAllusers, getUserById } from "./thunk";
 
 const userSlice = createSlice({
     name: 'users',
@@ -24,6 +24,16 @@ const userSlice = createSlice({
             .addCase(getUserById.rejected, (state) => {
                 state.users = null;
             })
+              .addCase(getAllusers.fulfilled, (state, action) => {
+                state.users = action.payload;
+            })
+            .addCase(getAllusers.pending, (state) => {
+                state.users = null;
+            })
+            .addCase(getAllusers.rejected, (state) => {
+                state.users = null;
+            })
+            
     }
 });
 export const { insertId } = userSlice.actions;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from 'react';
 import {
   TextField,
   Button,
@@ -6,49 +6,41 @@ import {
   Box,
   Stack,
   Avatar,
-  Paper,
-  CircularProgress,
-  Alert,
-  Fade
-} from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { createNewUserAsyncAction, getUserById } from "../Redux/thunk";
+  Paper
+} from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import SendIcon from '@mui/icons-material/Send';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { createNewUser } from '../Redux/thunk';
 
 const theme = createTheme({
-  direction: "ltr",
   palette: {
-    primary: { main: "#1976d2" },
-    secondary: { main: "#00bcd4" },
-    background: { default: "#f4f8fb" },
-    success: { main: "#43a047" },
-    error: { main: "#e53935" },
+    primary: { main: '#1976d2' },
+    secondary: { main: '#6c757d' },
+    background: { default: '#f4f8fb' },
   },
   typography: {
     fontFamily: 'Varela Round, Alef, sans-serif',
-    h4: { fontWeight: 900, letterSpacing: 1 },
-    subtitle1: { fontWeight: 500 },
+    h5: { fontWeight: 800 },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 30,
-          textTransform: "none",
-          fontWeight: 700,
-          fontSize: "1.1rem",
-          boxShadow: "0 2px 12px 0 rgba(21,101,192,0.10)",
+          borderRadius: 24,
+          textTransform: 'none',
+          fontWeight: 600,
+          fontSize: '1rem',
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 28,
-          boxShadow: "0 8px 32px 0 rgba(21,101,192,0.13)",
-          background: "rgba(255,255,255,0.97)",
+          borderRadius: 20,
+          boxShadow: '0 4px 24px 0 rgba(25, 118, 210, 0.08)',
         },
       },
     },
@@ -56,50 +48,36 @@ const theme = createTheme({
 });
 
 const SignUp = () => {
+  const [firstName, setFirstName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [message, setMessage] = useState('');
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { id: paramId } = useParams();
-
-  const [id, setId] = useState(paramId || "");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage("");
-    setSuccess(false);
-
-    if (!id.trim() || !name.trim() || !phone.trim()) {
-      setMessage("All fields are required.");
+    setMessage('');
+    if (!id || !firstName.trim() || !phone.trim()) {
+      setMessage('יש למלא את כל השדות');
       return;
     }
-
-    setLoading(true);
+    const customerData = {
+      id: isNaN(Number(id)) ? id : Number(id),
+      name: firstName,
+      phone: phone,
+    };
     try {
-      const customerData = {
-        id: parseInt(id),
-        name,
-        phone,
-      };
-      const resultAction = await dispatch(createNewUserAsyncAction(customerData));
-      if (createNewUserAsyncAction.fulfilled.match(resultAction)) {
-        setSuccess(true);
-        setMessage("Registration successful! Redirecting...");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await dispatch(getUserById(id));
-        navigate(`/CheckCategory/${name}`);
+      const resultAction = await dispatch(createNewUser(customerData));
+      if (createNewUser.fulfilled.match(resultAction)) {
+        setMessage('נרשמת בהצלחה!');
+        await new Promise(res => setTimeout(res, 1000));
+        navigate(`/CheckCategory/${firstName.trim()}/${id}`);
       } else {
-        setSuccess(false);
-        setMessage("Registration failed: " + (resultAction.error?.message || "Unknown error"));
+        setMessage('הרשמה נכשלה: ' + (resultAction.error?.message || ''));
       }
     } catch (error) {
-      setSuccess(false);
-      setMessage("Error: " + error.message);
-    } finally {
-      setLoading(false);
+      setMessage('שגיאה: ' + error.message);
     }
   };
 
@@ -108,126 +86,90 @@ const SignUp = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          background: `linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%), url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')`,
-          backgroundRepeat: "repeat",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Fade in timeout={800}>
-          <Paper
-            elevation={10}
-            sx={{
-              p: { xs: 3, sm: 5 },
-              width: 400,
-              maxWidth: "95vw",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-              backdropFilter: "blur(2px)",
-            }}
-          >
-            <Avatar
-              sx={{
-                bgcolor: "secondary.main",
-                width: 70,
-                height: 70,
-                mb: 1,
-                boxShadow: "0 4px 16px 0 rgba(0,188,212,0.18)",
-              }}
-            >
-              <PersonAddAlt1Icon fontSize="large" />
-            </Avatar>
-            <Typography variant="h4" color="primary" gutterBottom>
-              Sign Up
+        <Paper
+          elevation={6}
+          sx={{
+            p: { xs: 3, sm: 5 },
+            width: 370,
+            maxWidth: "95vw",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Avatar sx={{ bgcolor: 'primary.main', width: 60, height: 60, mb: 1 }}>
+            <PersonAddAlt1Icon fontSize="large" />
+          </Avatar>
+          <Typography variant="h4" color="primary" fontWeight={700} gutterBottom>
+            הרשמה
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" mb={2}>
+            מלא את פרטיך להרשמה
+          </Typography>
+          {message && (
+            <Typography variant="body2" color={message.includes('הצלחה') ? "success.main" : "error"} align="center" mb={2}>
+              {message}
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary" mb={2}>
-              Please fill in your details to register
-            </Typography>
-            {message && (
-              <Alert
-                severity={success ? "success" : "error"}
-                sx={{ width: "100%", mb: 1, fontWeight: 600, fontSize: "1rem" }}
-              >
-                {message}
-              </Alert>
-            )}
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-              <TextField
-                label="ID Number"
-                variant="outlined"
-                fullWidth
-                value={id}
-                onChange={(e) => setId(e.target.value.replace(/\D/g, ""))}
-                inputProps={{ maxLength: 9 }}
+          )}
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+            <TextField
+              label="תעודת זהות"
+              variant="outlined"
+              fullWidth
+              value={id || ''}
+              InputProps={{ readOnly: true }}
+              sx={{ mb: 3, background: "#f7fafc", borderRadius: 2 }}
+            />
+            <TextField
+              label="שם פרטי"
+              variant="outlined"
+              fullWidth
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              sx={{ mb: 3, background: "#f7fafc", borderRadius: 2 }}
+              required
+            />
+            <TextField
+              label="מספר טלפון"
+              variant="outlined"
+              fullWidth
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              sx={{ mb: 3, background: "#f7fafc", borderRadius: 2 }}
+              required
+            />
+            <Stack direction="row" spacing={2} justifyContent="center">
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                endIcon={<SendIcon />}
+                disabled={!firstName.trim() || !phone.trim()}
                 sx={{
-                  mb: 2,
-                  background: "#f7fafc",
-                  borderRadius: 2,
-                  boxShadow: "0 1px 4px 0 rgba(21,101,192,0.06)",
-                }}
-              />
-              <TextField
-                label="Full Name"
-                variant="outlined"
-                fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                sx={{
-                  mb: 2,
-                  background: "#f7fafc",
-                  borderRadius: 2,
-                  boxShadow: "0 1px 4px 0 rgba(21,101,192,0.06)",
-                }}
-              />
-              <TextField
-                label="Phone Number"
-                variant="outlined"
-                fullWidth
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                inputProps={{ maxLength: 10 }}
-                sx={{
-                  mb: 3,
-                  background: "#f7fafc",
-                  borderRadius: 2,
-                  boxShadow: "0 1px 4px 0 rgba(21,101,192,0.06)",
-                }}
-              />
-              <Stack direction="row" spacing={2} justifyContent="center">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  disabled={!id.trim() || !name.trim() || !phone.trim() || loading}
-                  endIcon={loading ? <CircularProgress size={20} /> : <PersonAddAlt1Icon />}
-                  sx={{
-                    px: 3,
-                    fontWeight: 700,
+                  px: 3,
+                  boxShadow: "0 2px 8px 0 rgba(25, 118, 210, 0.10)",
+                  border: "2px solid #1976d2",
+                  transition: "all 0.2s",
+                  "&:hover": { background: "#1565c0" },
+                  "&.Mui-disabled": {
+                    background: "#e3f0ff",
+                    color: "#1976d2",
                     border: "2px solid #1976d2",
-                    background: "linear-gradient(90deg, #1976d2 60%, #00bcd4 100%)",
-                    color: "#fff",
-                    boxShadow: "0 2px 8px 0 rgba(21,101,192,0.13)",
-                    transition: "all 0.2s",
-                    "&:hover": {
-                      background: "linear-gradient(90deg, #1565c0 80%, #00bcd4 100%)",
-                    },
-                    "&.Mui-disabled": {
-                      background: "#e3f0ff",
-                      color: "#1976d2",
-                      border: "2px solid #1976d2",
-                      opacity: 0.7,
-                    },
-                  }}
-                >
-                  Continue
-                </Button>
-              </Stack>
-            </Box>
-          </Paper>
-        </Fade>
+                    opacity: 0.7,
+                  }
+                }}
+              >
+                הרשמה
+              </Button>
+            </Stack>
+          </Box>
+        </Paper>
       </Box>
     </ThemeProvider>
   );

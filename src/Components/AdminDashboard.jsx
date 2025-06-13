@@ -1,109 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {getAllusers}
-    //, getUserPromptsAsync } 
-     from "../Redux/thunk";
+// import { fetchAllUsers } from "../Redux/thunk";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  Typography, Button, Dialog, DialogTitle, DialogContent, CircularProgress
+  CircularProgress,
+  Alert,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
 } from "@mui/material";
+import { getAllusers } from "../Redux/thunk";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.user?.users || []);
-  const loadingUsers = useSelector((state) => state.user?.loading);
-  const prompts = useSelector((state) => state.prompts?.userPrompts || []);
-  const loadingPrompts = useSelector((state) => state.prompts?.loading);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [open, setOpen] = useState(false);
+  const users = useSelector((state) => state.user.users);
 
   useEffect(() => {
     dispatch(getAllusers());
   }, [dispatch]);
 
-//   const handleOpenHistory = (user) => {
-//     setSelectedUser(user);
-//     dispatch(getUserPromptsAsync(user.id));
-//     setOpen(true);
-//   };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedUser(null);
-  };
-
   return (
-    <TableContainer component={Paper} sx={{ mt: 4, maxWidth: 900, mx: "auto" }}>
-      <Typography variant="h5" align="center" sx={{ my: 2 }}>
-        ניהול משתמשים
+    <Paper sx={{ p: 3, maxWidth: 600, margin: "auto", mt: 5 }}>
+      <Typography variant="h5" fontWeight={700} gutterBottom>
+        All Users
       </Typography>
-      {loadingUsers && <CircularProgress sx={{ display: "block", mx: "auto", my: 4 }} />}
-      {!loadingUsers && users.length === 0 && (
-        <Typography align="center" sx={{ my: 4 }}>לא נמצאו משתמשים.</Typography>
-      )}
-      {!loadingUsers && users.length > 0 && (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>שם</TableCell>
-              <TableCell>טלפון</TableCell>
-              <TableCell>מספר מזהה</TableCell>
-              <TableCell>היסטוריית למידה</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.phone}</TableCell>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>
-                  <Button variant="outlined" onClick={() => handleOpenHistory(user)}>
-                    הצג היסטוריה
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-
-      <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
-        <DialogTitle>
-          היסטוריית למידה של {selectedUser?.name}
-        </DialogTitle>
-        <DialogContent>
-          {loadingPrompts && <CircularProgress sx={{ display: "block", mx: "auto", my: 4 }} />}
-          {!loadingPrompts && prompts.length === 0 && (
-            <Typography align="center" sx={{ my: 4 }}>לא נמצאו שיעורים.</Typography>
-          )}
-          {!loadingPrompts && prompts.length > 0 && (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>קטגוריה</TableCell>
-                  <TableCell>תת־קטגוריה</TableCell>
-                  <TableCell>שאלה</TableCell>
-                  <TableCell>תשובת AI</TableCell>
-                  <TableCell>תאריך</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {prompts.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.categoryName || row.category?.name}</TableCell>
-                    <TableCell>{row.subCategoryName || row.subCategory?.name}</TableCell>
-                    <TableCell>{row.prompt}</TableCell>
-                    <TableCell>{row.response}</TableCell>
-                    <TableCell>{new Date(row.created_at).toLocaleString("he-IL")}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </DialogContent>
-      </Dialog>
-    </TableContainer>
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
+      <List>
+        {users.map((user) => (
+          <ListItem key={user.id} divider>
+            <ListItemText
+              primary={user.name}
+              secondary={`ID: ${user.id} | Phone: ${user.phone}`}
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Paper>
   );
 };
 

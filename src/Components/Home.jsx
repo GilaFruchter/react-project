@@ -1,59 +1,90 @@
 import React from "react";
-import { Box, Paper, Typography, Button, Stack } from "@mui/material";
+import { Button, Typography, Stack, AppBar, Toolbar, Box } from "@mui/material";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import SchoolIcon from "@mui/icons-material/School";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        px: 2,
-      }}
-    >
-      <Paper
-        elevation={0}
+    <React.Fragment>
+      <AppBar position="static" color="transparent" elevation={0}>
+        <Toolbar>
+          <SchoolIcon color="primary" sx={{ fontSize: 36, mr: 1 }} />
+          <Typography
+            variant="h4"
+            color="primary"
+            sx={{ flexGrow: 1, fontWeight: 700 }}
+          >
+            AI Learning Platform
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Box
         sx={{
-          p: { xs: 3, md: 5 },
-          borderRadius: 4,
-          minWidth: { xs: 320, md: 400 },
-          maxWidth: 500,
-          background: "#fff",
+          minHeight: "90vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <Typography variant="h4" fontWeight={700} color="primary" gutterBottom>
-          ברוך הבא!
+        <Typography
+          variant="h3"
+          color="primary"
+          fontWeight={700}
+          gutterBottom
+          sx={{
+            mb: 5,
+            letterSpacing: 1,
+            textAlign: "center",
+            fontSize: { xs: 28, sm: 38 },
+          }}
+        >
+          Welcome!
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
-          זהו עמוד הבית של האפליקציה שלך. בחר פעולה להתחלה:
-        </Typography>
-        <Stack spacing={2} sx={{ width: "100%" }}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
           <Button
             variant="contained"
             color="primary"
-            fullWidth
-            onClick={() => navigate("/LogIn")}
+            size="large"
+            startIcon={<LockOpenIcon />}
+            sx={{
+              px: 5,
+              py: 1.5,
+              fontWeight: 600,
+              fontSize: 20,
+              borderRadius: 3,
+              boxShadow: "0 2px 8px 0 rgba(25, 118, 210, 0.08)",
+              textTransform: "none",
+            }}
+            onClick={() => navigate("/login")}
           >
-            התחברות
+            Login
           </Button>
           <Button
             variant="outlined"
             color="primary"
-            fullWidth
-            onClick={() => navigate("/history")}
+            size="large"
+            startIcon={<AdminPanelSettingsIcon />}
+            sx={{
+              px: 5,
+              py: 1.5,
+              fontWeight: 600,
+              fontSize: 20,
+              borderRadius: 3,
+              textTransform: "none",
+              borderWidth: 2,
+            }}
+            onClick={() => navigate("/AdminDashboard")}
           >
-            היסטוריית למידה
+            Admin
           </Button>
         </Stack>
-      </Paper>
-    </Box>
+      </Box>
+    </React.Fragment>
   );
 };
 

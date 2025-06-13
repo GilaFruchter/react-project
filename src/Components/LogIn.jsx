@@ -21,7 +21,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { getUserById } from "../Redux/thunk";
+import { getUserById, createNewUser } from "../Redux/thunk";
 
 const theme = createTheme({
   direction: "rtl",
@@ -79,11 +79,12 @@ const LogIn = () => {
       const result = await dispatch(getUserById(id));
       if (getUserById.fulfilled.match(result)) {
         const user = result.payload;
-        const name = user?.name || user?.firstName || user?.Name || "משתמש";
+        // Clean the name from extra spaces
+        const cleanName = user?.name ? user.name.trim() : "User";
         setSuccess(true);
-        setMessage(`ברוך הבא, ${name}!`);
+        setMessage(`ברוך הבא, ${cleanName}!`);
         setTimeout(() => {
-          navigate(`/CheckCategory/${name}`);
+         navigate(`/CheckCategory/${user.name.replace(/^\s+|\s+$/g, '').replace(/\s+/g, '-')}/${user.id}`);
         }, 1200);
       } else {
         setSuccess(false);

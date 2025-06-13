@@ -26,8 +26,8 @@ export const getUserById = createAsyncThunk(
 );
 
 
-export const createNewUserAsyncAction = createAsyncThunk(
-    'customers/createNewCustomer',
+export const createNewUser = createAsyncThunk(
+    'customers/createNewUser',
     async (customerData) => {
         const response = await fetch('http://localhost:5032/api/users/', {
             method: 'POST',
@@ -112,6 +112,21 @@ export const addPromptAsync = createAsyncThunk(
       });
       if (!response.ok) {
         throw new Error("Failed to add prompt");
+      }
+      return await response.json();
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+export const GetPromptById=createAsyncThunk(
+  "prompts/GetPromptById",
+  async (promptId, thunkAPI) => {
+    try {
+      const response = await fetch(`http://localhost:5032/api/Prompts/${promptId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch prompt");
       }
       return await response.json();
     } catch (err) {

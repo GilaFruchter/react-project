@@ -10,16 +10,12 @@ import AdminDashboard from './Components/AdminDashboard';
 function App() {
   return (
     <BrowserRouter>
-      <nav>
-        <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>Home</NavLink>
-        <NavLink to="/LogIn" className={({ isActive }) => isActive ? 'active' : ''}>Log In</NavLink>
-      </nav>
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/CheckCategory/:name' element={<CheckCategory />} />
+       <Route path="/CheckCategory/:name/:id" element={<CheckCategory />} />
         <Route path='/LogIn' element={<LogIn />} />
         <Route path='/SignUp/:id' element={<SignUp />} />
-        <Route path="/LearningHistory" element={<LearningHistory />} />
+        <Route path="/LearningHistory/:id" element={<LearningHistory />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
       </Routes>

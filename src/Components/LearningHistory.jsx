@@ -1,58 +1,52 @@
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-// import { getUserPromptsAsync } from "../Redux/thunk"; // ודא שיש thunk כזה
+import { useDispatch, useSelector } from "react-redux";
+import { GetPromptById } from "../Redux/thunk";
+import { useParams } from "react-router-dom";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress
+  CircularProgress,
+  Alert,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Paper
 } from "@mui/material";
 
 const LearningHistory = () => {
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.user?.user?.id); // עדכן לפי מבנה ה-state שלך
-  const prompts = useSelector((state) => state.prompts?.userPrompts || []);
-  const loading = useSelector((state) => state.prompts?.loading);
-  const error = useSelector((state) => state.prompts?.error);
+  const { id } = useParams(); // make sure your route is /LearningHistory/:id
 
-//   useEffect(() => {
-//     if (userId) {
-//       dispatch(getUserPromptsAsync(userId));
-//     }
-//   }, [userId, dispatch]);
+  // קח את הסטייט מה-slice של prompts
+  const { prompts, loading, error } = useSelector((state) => state.prompt);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(GetPromptById(id));
+    }
+  }, [dispatch, id]);
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 4, maxWidth: 900, mx: "auto" }}>
-      <Typography variant="h5" align="center" sx={{ my: 2 }}>
-        היסטוריית למידה
+    <Paper sx={{ p: 3, maxWidth: 600, margin: "auto", mt: 5 }}>
+      <Typography variant="h5" fontWeight={700} gutterBottom>
+        Learning History
       </Typography>
-      {loading && <CircularProgress sx={{ display: "block", mx: "auto", my: 4 }} />}
-      {error && <Typography color="error" align="center">{error}</Typography>}
-      {!loading && prompts.length === 0 && (
-        <Typography align="center" sx={{ my: 4 }}>לא נמצאו שיעורים קודמים.</Typography>
-      )}
-      {!loading && prompts.length > 0 && (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>קטגוריה</TableCell>
-              <TableCell>תת־קטגוריה</TableCell>
-              <TableCell>שאלה</TableCell>
-              <TableCell>תשובת AI</TableCell>
-              <TableCell>תאריך</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {prompts.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.categoryName || row.category?.name}</TableCell>
-                <TableCell>{row.subCategoryName || row.subCategory?.name}</TableCell>
-                <TableCell>{row.prompt}</TableCell>
-                <TableCell>{row.response}</TableCell>
-                <TableCell>{new Date(row.created_at).toLocaleString("he-IL")}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </TableContainer>
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
+      <List>
+        {prompts && prompts.length > 0 ? (
+          prompts.map((prompt) => (
+            <ListItem key={prompt.id} divider>
+              <ListItemText
+                primary={prompt.prompt}
+                secondary={prompt.response}
+              />
+            </ListItem>
+          ))
+        ) : (
+          <Typography>No history found.</Typography>
+        )}
+      </List>
+    </Paper>
   );
 };
 

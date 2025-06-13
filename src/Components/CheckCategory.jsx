@@ -1,28 +1,25 @@
 import React, { useEffect, useState } from "react";
 import {
   Box, Paper, Typography, FormControl, InputLabel, Select, MenuItem,
-  TextField, Button, CircularProgress, Alert, Stack, Fade, IconButton, Avatar
+  TextField, Button, CircularProgress, Alert, Stack, Fade, IconButton
 } from "@mui/material";
 import HistoryIcon from "@mui/icons-material/History";
 import SendIcon from "@mui/icons-material/Send";
-import SchoolIcon from "@mui/icons-material/School";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllCategories, getAllsubCategoriesById, addPromptAsync } from "../Redux/thunk";
+import { getAllCategories, getAllsubCategoriesById, addPromptAsync } from "/src/Redux/thunk.js";
 import { useNavigate, useParams } from "react-router-dom";
 
 const CheckCategory = () => {
+  const { name, id } = useParams(); // id from URL, always exists
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { name } = useParams();
-  const user = useSelector((state) => state.user?.user);
-  const userId = user?.id;
   const categoriesList = useSelector((state) => state.category.categories);
   const subsCategoryList = useSelector((state) => state.subCategory.subsCategories);
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [aiResponse, setAiResponse] = useState(null);
+  const [aiResponse, setAiResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -40,24 +37,24 @@ const CheckCategory = () => {
   const categories =
     categoriesList && categoriesList.length > 0
       ? categoriesList.map((cat) => ({
-        id: cat.id,
-        name: cat.name,
-      }))
+          id: cat.id,
+          name: cat.name,
+        }))
       : [];
 
   const subsCategoryData =
     subsCategoryList && subsCategoryList.length > 0 && selectedCategory
       ? subsCategoryList
-        .filter((sub) => sub.categoryId === Number(selectedCategory))
-        .map((sub) => ({
-          id: sub.id,
-          name: sub.name,
-        }))
+          .filter((sub) => sub.categoryId === Number(selectedCategory))
+          .map((sub) => ({
+            id: sub.id,
+            name: sub.name,
+          }))
       : [];
 
   const handleSubmitPrompt = async () => {
     setError("");
-    setAiResponse(null);
+    setAiResponse("");
     if (!selectedCategory || !selectedSubCategory || !prompt) {
       setError("Please select a category, sub-category, and enter a prompt.");
       return;
@@ -66,7 +63,7 @@ const CheckCategory = () => {
     try {
       const resultAction = await dispatch(
         addPromptAsync({
-          userId,
+          userId: id, // use id from URL!
           categoryId: Number(selectedCategory),
           subCategoryId: Number(selectedSubCategory),
           prompt1: prompt,
@@ -89,15 +86,14 @@ const CheckCategory = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          background: `linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%), url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')`,
-          backgroundRepeat: "repeat",
+          background: "#f7fafc",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
         <Paper
-          elevation={8}
+          elevation={4}
           sx={{
             p: { xs: 2, sm: 4 },
             width: { xs: "98vw", sm: 400, md: 430 },
@@ -106,28 +102,18 @@ const CheckCategory = () => {
             flexDirection: "column",
             alignItems: "center",
             gap: 2,
-            borderRadius: 5,
-            backdropFilter: "blur(2px)",
-            boxShadow: "0 8px 32px 0 rgba(21,101,192,0.13)",
-            background: "rgba(255,255,255,0.97)",
+            borderRadius: 4,
           }}
         >
           <Stack direction="row" spacing={1} alignItems="center" sx={{ alignSelf: "flex-end" }}>
-            <IconButton color="primary" onClick={() => navigate("/LearningHistory")} title="Learning History">
+            <IconButton
+              onClick={() => {
+                navigate(`/LearningHistory/${id}`); // always use id from URL!
+              }}
+            >
               <HistoryIcon />
             </IconButton>
           </Stack>
-          <Avatar
-            sx={{
-              bgcolor: "primary.main",
-              width: 48,
-              height: 48,
-              mb: 1,
-              boxShadow: "0 4px 16px 0 rgba(21,101,192,0.18)",
-            }}
-          >
-            <SchoolIcon fontSize="medium" />
-          </Avatar>
           <Typography variant="h6" color="primary" fontWeight={700} gutterBottom>
             Hi {name}, let's start learning!
           </Typography>
@@ -182,7 +168,6 @@ const CheckCategory = () => {
               mb: 2,
               background: "#f7fafc",
               borderRadius: 2,
-              boxShadow: "0 1px 4px 0 rgba(21,101,192,0.06)",
             }}
           />
           <Button
@@ -194,34 +179,28 @@ const CheckCategory = () => {
             sx={{
               px: 3,
               fontWeight: 700,
-              border: "2px solid #1976d2",
-              background: "linear-gradient(90deg, #1976d2 60%, #00bcd4 100%)",
-              color: "#fff",
-              boxShadow: "0 2px 8px 0 rgba(21,101,192,0.13)",
-              transition: "all 0.2s",
-              "&:hover": {
-                background: "linear-gradient(90deg, #1565c0 80%, #00bcd4 100%)",
-              },
-              "&.Mui-disabled": {
-                background: "#e3f0ff",
-                color: "#1976d2",
-                border: "2px solid #1976d2",
-                opacity: 0.7,
-              },
+              borderRadius: 2,
             }}
           >
             Get Lesson
           </Button>
-          {aiResponse && (
-            <Alert severity="success" sx={{ width: "100%", mt: 2 }}>
-              <Typography variant="subtitle2" color="primary" fontWeight={700}>
-                AI Response:
-              </Typography>
-              <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+          <Box
+            sx={{
+              width: "100%",
+              minHeight: 80,
+              mt: 2,
+              p: 2,
+              borderRadius: 2,
+              border: "1px solid #e3e8ee",
+              display: aiResponse ? "block" : "none",
+            }}
+          >
+            {aiResponse && (
+              <Typography variant="body1" color="primary" sx={{ whiteSpace: "pre-line" }}>
                 {aiResponse}
               </Typography>
-            </Alert>
-          )}
+            )}
+          </Box>
         </Paper>
       </Box>
     </Fade>
