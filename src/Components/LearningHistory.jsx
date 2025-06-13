@@ -10,14 +10,13 @@ import {
   ListItem,
   ListItemText,
   Paper,
-  Box // ודא ש-Box מיובא
+  Box 
 } from "@mui/material";
 
 const LearningHistory = () => {
   const dispatch = useDispatch();
-  const { id } = useParams(); // ודא שהנתיב שלך ב-App.js הוא /LearningHistory/:id
+  const { id } = useParams(); 
 
-  // קח את הסטייט מה-slice של prompts (או איך שקראת לו)
   const { prompts, loading, error } = useSelector((state) => state.prompt);
 
   useEffect(() => {
@@ -42,14 +41,12 @@ const LearningHistory = () => {
         </Box>
       )}
 
-      {/* מצב שגיאה */}
       {error && <Alert severity="error">{error}</Alert>}
 
-      {/* הצגת רשימת הפרומפטים */}
       {!loading && !error && (
         <List>
           {prompts && prompts.length > 0 ? (
-            prompts.map((promptItem) => ( // שיניתי את השם ל-promptItem למניעת בלבול עם המשתנה prompt מה-slice
+            prompts.map((promptItem) => ( 
               <ListItem key={promptItem.id} divider>
                 <ListItemText
                   primary={promptItem.prompt}
@@ -58,7 +55,6 @@ const LearningHistory = () => {
               </ListItem>
             ))
           ) : (
-            // הודעה כשאין נתונים, מוצגת רק אם אין טעינה ואין שגיאה
             <Alert severity="info" sx={{ mt: 2 }}>
               אין היסטוריה זמינה עבור משתמש זה.
             </Alert>
