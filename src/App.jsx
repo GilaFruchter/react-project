@@ -4,6 +4,8 @@ import CheckCategory from './Components/CheckCategory';
 import LogIn from './Components/LogIn';
 import SignUp from './Components/SignUp';
 import './App.css';
+import LearningHistory from './Components/LearningHistory';
+import AdminDashboard from './Components/AdminDashboard';
 
 function App() {
   return (
@@ -17,6 +19,9 @@ function App() {
         <Route path='/CheckCategory/:name' element={<CheckCategory />} />
         <Route path='/LogIn' element={<LogIn />} />
         <Route path='/SignUp/:id' element={<SignUp />} />
+        <Route path="/LearningHistory" element={<LearningHistory />} />
+        <Route path="/AdminDashboard" element={<AdminDashboard />} />
+
       </Routes>
     </BrowserRouter>
   );

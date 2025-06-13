@@ -79,3 +79,59 @@ export const getAllsubCategoriesById = createAsyncThunk(
     }
   }
 );
+
+export const getResponseFromApi = createAsyncThunk(
+  'api/getResponse',
+  async (endpoint, thunkAPI) => {
+    try {
+      const response = await fetch(`http://localhost:5032/api/${endpoint}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
+);
+
+export const addPromptAsync = createAsyncThunk(
+  "prompts/addPrompt",
+  async ({ userId, categoryId, subCategoryId, prompt1 }, thunkAPI) => {
+    try {
+      const response = await fetch("http://localhost:5032/api/Prompts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          categoryId,
+          subCategoryId,
+          prompt1,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to add prompt");
+      }
+      return await response.json();
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+//add getUserPromptsAsync
+// export const getUserPromptsAsync = createAsyncThunk(
+//   "prompts/getUserPrompts",
+//   async (userId, thunkAPI) => {
+//     try {
+//       const response = await fetch(`http://localhost:5032/api/Prompts/user/${userId}`);
+//       if (!response.ok) {
+//         throw new Error("Failed to fetch user prompts");
+//       }
+//       return await response.json();
+//     } catch (err) {
+//       return thunkAPI.rejectWithValue(err.message);
+//     }
+//   }
+// );

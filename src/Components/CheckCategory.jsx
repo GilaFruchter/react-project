@@ -1,26 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Box, Typography, Paper, Stack, Button, CircularProgress, Alert, FormControl,
-  InputLabel, Select, MenuItem, TextField
+  Box, Paper, Typography, FormControl, InputLabel, Select, MenuItem,
+  TextField, Button, CircularProgress, Alert, Stack, Fade, IconButton, Avatar
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllCategories, getAllsubCategoriesById } from "../Redux/thunk";
-
+import HistoryIcon from "@mui/icons-material/History";
+import SendIcon from "@mui/icons-material/Send";
+import SchoolIcon from "@mui/icons-material/School";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllCategories, getAllsubCategoriesById, addPromptAsync } from "../Redux/thunk";
+import { useNavigate, useParams } from "react-router-dom";
 
 const CheckCategory = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { name } = useParams();
+  const user = useSelector((state) => state.user?.user);
+  const userId = user?.id;
+  const categoriesList = useSelector((state) => state.category.categories);
+  const subsCategoryList = useSelector((state) => state.subCategory.subsCategories);
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [prompt, setPrompt] = useState("");
   const [aiResponse, setAiResponse] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const categoriesList = useSelector((state) => state.category.categories);
-  const subsCategoryList = useSelector((state) => state.subCategory.subsCategories);
-
-  console.log("categoriesList from Redux:", categoriesList);
-  console.log("subsCategoryList from Redux:", subsCategoryList);
-
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     dispatch(getAllCategories());
@@ -29,6 +33,7 @@ const CheckCategory = () => {
   useEffect(() => {
     if (selectedCategory) {
       dispatch(getAllsubCategoriesById(selectedCategory));
+      setSelectedSubCategory("");
     }
   }, [selectedCategory, dispatch]);
 
@@ -41,118 +46,106 @@ const CheckCategory = () => {
       : [];
 
   const subsCategoryData =
-    subsCategoryList && subsCategoryList.length > 0
-      ? subsCategoryList.map((sub) => ({
-        id: sub.id,
-        name: sub.name,
-      }))
+    subsCategoryList && subsCategoryList.length > 0 && selectedCategory
+      ? subsCategoryList
+        .filter((sub) => sub.categoryId === Number(selectedCategory))
+        .map((sub) => ({
+          id: sub.id,
+          name: sub.name,
+        }))
       : [];
 
   const handleSubmitPrompt = async () => {
+    setError("");
+    setAiResponse(null);
     if (!selectedCategory || !selectedSubCategory || !prompt) {
       setError("Please select a category, sub-category, and enter a prompt.");
       return;
     }
-    setError(null);
-    setIsLoading(true);
-    setAiResponse(null);
-
+    setLoading(true);
     try {
-      const mockApiResponse = await new Promise((resolve) =>
-        setTimeout(() => {
-          resolve({
-            lesson: `This is a generated lesson about "${prompt}" in the category of ${categories.find((cat) => cat.id === selectedCategory)?.name
-              } > ${subsCategoryData.find( // תיקון: subsCategoryData במקום subCategoriesData[selectedCategory]
-                (sub) => sub.id === selectedSubCategory
-              )?.name
-              }.
-
-            The AI provides detailed information, examples, and key takeaways for a comprehensive learning experience. For example, if you asked about 'black holes', the AI might cover:
-            - What are black holes?
-            - How do they form?
-            - Types of black holes.
-            - The event horizon.
-            - Hawking radiation (theoretical).
-            - Their impact on galaxies.
-
-            This is a dummy response. In a real application, this would be a rich, educational text from a language model.`,
-          });
-        }, 2000)
+      const resultAction = await dispatch(
+        addPromptAsync({
+          userId,
+          categoryId: Number(selectedCategory),
+          subCategoryId: Number(selectedSubCategory),
+          prompt1: prompt,
+        })
       );
-      setAiResponse(mockApiResponse.lesson);
+      if (addPromptAsync.fulfilled.match(resultAction)) {
+        setAiResponse(resultAction.payload.response || "No response from AI.");
+      } else {
+        setError("Failed to get AI response.");
+      }
     } catch (err) {
-      setError("Failed to get AI response. Please try again.");
-      console.error("Error submitting prompt:", err);
+      setError("Error: " + err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        py: 6,
-        px: 2,
-      }}
-    >
-      <Paper
-        elevation={6}
+    <Fade in timeout={700}>
+      <Box
         sx={{
-          p: { xs: 3, md: 5 },
-          borderRadius: 4,
-          minWidth: { xs: "90%", sm: 450, md: 600 },
-          maxWidth: 800,
-          background: "#ffffff",
-          boxShadow: "0 12px 40px 0 rgba(31, 38, 135, 0.15)",
+          minHeight: "100vh",
+          background: `linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%), url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')`,
+          backgroundRepeat: "repeat",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          gap: 3,
+          justifyContent: "center",
         }}
       >
-        <Typography
-          variant="h4"
-          fontWeight={700}
-          color="primary.main"
-          gutterBottom
-          align="center"
-          sx={{ letterSpacing: 1, textShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
+        <Paper
+          elevation={8}
+          sx={{
+            p: { xs: 2, sm: 4 },
+            width: { xs: "98vw", sm: 400, md: 430 },
+            maxWidth: "98vw",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            borderRadius: 5,
+            backdropFilter: "blur(2px)",
+            boxShadow: "0 8px 32px 0 rgba(21,101,192,0.13)",
+            background: "rgba(255,255,255,0.97)",
+          }}
         >
-          AI Learning Dashboard
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          color="text.secondary"
-          align="center"
-          sx={{ mb: 2 }}
-        >
-          Choose a topic, ask a question, and let our AI teach you!
-        </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        <Stack spacing={3} sx={{ width: "100%" }}>
-          <FormControl fullWidth>
-            <InputLabel id="category-select-label">Category</InputLabel>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ alignSelf: "flex-end" }}>
+            <IconButton color="primary" onClick={() => navigate("/LearningHistory")} title="Learning History">
+              <HistoryIcon />
+            </IconButton>
+          </Stack>
+          <Avatar
+            sx={{
+              bgcolor: "primary.main",
+              width: 48,
+              height: 48,
+              mb: 1,
+              boxShadow: "0 4px 16px 0 rgba(21,101,192,0.18)",
+            }}
+          >
+            <SchoolIcon fontSize="medium" />
+          </Avatar>
+          <Typography variant="h6" color="primary" fontWeight={700} gutterBottom>
+            Hi {name}, let's start learning!
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" mb={2}>
+            Select a category, sub-category, and enter your learning prompt.
+          </Typography>
+          {error && (
+            <Alert severity="error" sx={{ width: "100%", mb: 1 }}>
+              {error}
+            </Alert>
+          )}
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="category-label">Category</InputLabel>
             <Select
-              labelId="category-select-label"
-              id="category-select"
+              labelId="category-label"
               value={selectedCategory}
               label="Category"
-              onChange={(e) => {
-                setSelectedCategory(Number(e.target.value));
-                setSelectedSubCategory("");
-              }}
-              sx={{ borderRadius: 2 }}
+              onChange={(e) => setSelectedCategory(e.target.value)}
             >
               {categories.map((cat) => (
                 <MenuItem key={cat.id} value={cat.id}>
@@ -161,94 +154,77 @@ const CheckCategory = () => {
               ))}
             </Select>
           </FormControl>
-
-          {selectedCategory && (
-            <FormControl fullWidth>
-              <InputLabel id="sub-category-select-label">Sub-Category</InputLabel>
-              <Select
-                labelId="sub-category-select-label"
-                id="sub-category-select"
-                value={selectedSubCategory}
-                label="Sub-Category"
-                onChange={(e) => setSelectedSubCategory(e.target.value)}
-                sx={{ borderRadius: 2 }}
-              >
-                {subsCategoryData.map((subCat) => (
-                  <MenuItem key={subCat.id} value={subCat.id}>
-                    {subCat.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="sub-category-label">Sub-Category</InputLabel>
+            <Select
+              labelId="sub-category-label"
+              value={selectedSubCategory}
+              label="Sub-Category"
+              onChange={(e) => setSelectedSubCategory(e.target.value)}
+              disabled={!selectedCategory}
+            >
+              {subsCategoryData.map((sub) => (
+                <MenuItem key={sub.id} value={sub.id}>
+                  {sub.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
-            label="Enter your learning prompt"
-            multiline
-            rows={4}
-            fullWidth
+            label="Your Prompt"
             variant="outlined"
+            fullWidth
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            sx={{ borderRadius: 2 }}
+            multiline
+            minRows={2}
+            sx={{
+              mb: 2,
+              background: "#f7fafc",
+              borderRadius: 2,
+              boxShadow: "0 1px 4px 0 rgba(21,101,192,0.06)",
+            }}
           />
-
           <Button
             variant="contained"
             color="primary"
-            size="large"
-            fullWidth
+            endIcon={loading ? <CircularProgress size={20} /> : <SendIcon />}
             onClick={handleSubmitPrompt}
-            disabled={isLoading || !selectedCategory || !selectedSubCategory || !prompt}
+            disabled={loading}
             sx={{
-              py: 1.5,
-              borderRadius: 2,
-              fontWeight: 600,
-              fontSize: "1.1rem",
-              boxShadow: "0 4px 15px rgba(0, 123, 255, 0.2)",
+              px: 3,
+              fontWeight: 700,
+              border: "2px solid #1976d2",
+              background: "linear-gradient(90deg, #1976d2 60%, #00bcd4 100%)",
+              color: "#fff",
+              boxShadow: "0 2px 8px 0 rgba(21,101,192,0.13)",
+              transition: "all 0.2s",
               "&:hover": {
-                boxShadow: "0 6px 20px rgba(0, 123, 255, 0.3)",
+                background: "linear-gradient(90deg, #1565c0 80%, #00bcd4 100%)",
+              },
+              "&.Mui-disabled": {
+                background: "#e3f0ff",
+                color: "#1976d2",
+                border: "2px solid #1976d2",
+                opacity: 0.7,
               },
             }}
           >
-            {isLoading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Get Lesson"
-            )}
+            Get Lesson
           </Button>
           {aiResponse && (
-            <Box sx={{ mt: 3, width: "100%" }}>
-              <Typography
-                variant="h5"
-                color="text.primary"
-                gutterBottom
-                sx={{ fontWeight: 600, mb: 2 }}
-              >
-                AI Generated Lesson:
+            <Alert severity="success" sx={{ width: "100%", mt: 2 }}>
+              <Typography variant="subtitle2" color="primary" fontWeight={700}>
+                AI Response:
               </Typography>
-              <Paper
-                elevation={2}
-                sx={{
-                  p: 3,
-                  borderRadius: 2,
-                  background: "#f0f4f8",
-                  minHeight: 150,
-                  maxHeight: 400,
-                  overflowY: "auto",
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                <Typography variant="body1" color="text.secondary">
-                  {aiResponse}
-                </Typography>
-              </Paper>
-            </Box>
+              <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+                {aiResponse}
+              </Typography>
+            </Alert>
           )}
-        </Stack>
-      </Paper>
-    </Box>
+        </Paper>
+      </Box>
+    </Fade>
   );
 };
 
