@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllusers, getUserById } from "./thunk";
+import { DeleteUserById, getAllusers, getUserById } from "./thunk";
 
 const userSlice = createSlice({
   name: 'user',
@@ -45,7 +45,19 @@ const userSlice = createSlice({
         state.loading = false;
         state.users = [];
         state.error = action.error.message || 'Failed to fetch all users';
-      });
+      })
+      .addCase(DeleteUserById.pending, (state) => {
+        state.deletionLoading = true;
+        state.deletionError = null;
+      })
+      .addCase(DeleteUserById.fulfilled, (state, action) => {
+        state.deletionLoading = false;
+        state.users = state.users.filter(user => user.id !== action.payload);
+      })
+      .addCase(DeleteUserById.rejected, (state, action) => {
+        state.deletionLoading = false;
+        state.deletionError = action.payload;
+      })
   },
 });
 

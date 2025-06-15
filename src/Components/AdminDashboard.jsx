@@ -1,182 +1,177 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import {
-  CircularProgress,
-  Alert,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  Box,
+  Box, Paper, Typography, CircularProgress, Alert, IconButton,
+  createTheme, ThemeProvider, CssBaseline,
+  AppBar, Toolbar,
+  List, ListItem, ListItemText, Divider,
   Button,
-  createTheme,
-  ThemeProvider,
-  CssBaseline,
-  Divider,
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
 } from "@mui/material";
-import HistoryIcon from '@mui/icons-material/History';
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-
-import { getAllusers } from "../Redux/thunk";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import SchoolIcon from "@mui/icons-material/School";
+import HistoryIcon from "@mui/icons-material/History";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { DeleteUserById, getAllusers } from "../Redux/thunk";
 
 const theme = createTheme({
-  direction: "ltr",
+  direction: "rtl",
   palette: {
-    mode: 'dark',
     primary: {
-      main: '#4db6ac',
-      light: '#80cbc4',
-      dark: '#00897b',
+      main: '#546E7A',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#7986cb',
-      light: '#aab6fe',
-      dark: '#495b9a',
-      contrastText: '#ffffff',
-    },
-    error: {
-      main: '#ef5350',
-    },
-    warning: {
-      main: '#ffb300',
-    },
-    info: {
-      main: '#29b6f6',
-    },
-    success: {
-      main: '#66bb6a',
-    },
-    background: {
-      default: '#263238',
-      paper: '#37474F',
+      main: '#B0BEC5',
+      light: '#CFD8DC',
+      dark: '#78909C',
     },
     text: {
-      primary: '#e0e0e0',
-      secondary: '#b0bec5',
-      disabled: '#757575',
+      primary: '#37474F',
+      secondary: '#78909C',
+      appBar: '#546E7A',
     },
-    darkGrey: {
-      main: '#546E7A',
-      light: '#819ca9',
-      dark: '#29434e',
-      contrastText: '#ffffff',
-    }
+    background: {
+      default: '#ECEFF1',
+      paper: '#FFFFFF',
+      appBar: 'rgba(0,0,0,0.05)',
+      appBarBlur: '5px',
+    },
+    error: { main: '#e53935' },
   },
   typography: {
     fontFamily: 'Heebo, sans-serif',
-    h3: {
-      fontWeight: 700,
-      fontSize: '3.5rem',
-      letterSpacing: -1.5,
-      lineHeight: 1.1,
-      '@media (max-width:960px)': {
-        fontSize: '3rem',
-      },
-      '@media (max-width:600px)': {
-        fontSize: '2.5rem',
-      },
-    },
     h4: {
-      fontWeight: 600,
+      fontWeight: 700,
       fontSize: '2.2rem',
       '@media (max-width:600px)': {
         fontSize: '1.8rem',
       },
+      color: '#37474F',
     },
     h5: {
       fontWeight: 500,
-      fontSize: '1.6rem',
+      fontSize: '1.5rem',
+      lineHeight: 1.6,
       '@media (max-width:600px)': {
-        fontSize: '1.3rem',
+        fontSize: '1.2rem',
       },
+    },
+    h6: {
+      fontWeight: 700,
+      fontSize: '1.6rem',
+      color: '#37474F',
+    },
+    subtitle1: {
+      fontWeight: 400,
+      fontSize: '1.05rem',
+      color: '#78909C',
+      textAlign: 'center',
+      lineHeight: 1.5,
     },
     body1: {
       fontSize: '1rem',
       lineHeight: 1.6,
+      color: '#424242',
     },
     body2: {
-      fontSize: '0.9rem',
-      color: '#b0bec5',
-    }
+      fontSize: '0.875rem',
+      lineHeight: 1.4,
+      color: '#607D8B',
+    },
   },
   components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 30,
-          padding: '12px 32px',
-          fontWeight: 600,
-          fontSize: '1.1rem',
-          textTransform: 'none',
-          transition: 'all 0.3s ease-in-out',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-          '&:hover': {
-            transform: 'translateY(-3px)',
-            boxShadow: '0 8px 25px rgba(0,0,0,0.3)',
-            opacity: 0.9,
-          },
-        },
-        containedPrimary: {
-          '&:hover': {
-            backgroundColor: '#00897b',
-          },
-        },
-        outlinedSecondary: {
-          borderColor: '#7986cb',
-          color: '#7986cb',
-          '&:hover': {
-            borderColor: '#aab6fe',
-            backgroundColor: 'rgba(121, 134, 203, 0.1)',
-            color: '#aab6fe',
-          },
-        }
-      },
-    },
     MuiAppBar: {
       styleOverrides: {
         root: {
           background: 'transparent',
-          boxShadow: 'none',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        },
+      },
+    },
+    MuiToolbar: {
+      styleOverrides: {
+        root: {
+          padding: '15px 30px',
+          '@media (max-width:600px)': {
+            padding: '10px 20px',
+          },
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: '#37474F',
+          borderRadius: 20,
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)',
+          transition: 'transform 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+          },
+        },
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
           borderRadius: 12,
-          boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+          border: '1px solid #ECEFF1',
         }
       }
     },
     MuiListItem: {
       styleOverrides: {
-        // התיקון כאן: השתמש בפונקציה שמקבלת את ה-theme
-        root: ({ theme }) => ({
-          '&:not(:last-of-type)': {
-            marginBottom: theme.spacing(1),
+        root: {
+          backgroundColor: '#FFFFFF',
+          '&:nth-of-type(odd)': {
+            backgroundColor: '#F9FBFB',
           },
-          borderRadius: theme.spacing(1),
-          transition: 'background-color 0.2s ease-in-out',
           '&:hover': {
-            backgroundColor: 'rgba(255,255,255,0.05)',
+            backgroundColor: '#F0F4F8',
+          }
+        }
+      }
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          margin: '0px 0',
+          borderColor: '#CFD8DC',
+        }
+      }
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          textTransform: "none",
+          fontWeight: 700,
+          fontSize: '1.0rem',
+          padding: '8px 16px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
           },
-        }),
+        },
+        containedError: {
+          backgroundColor: '#EF5350',
+          color: '#FFFFFF',
+          '&:hover': {
+            backgroundColor: '#D32F2F',
+          },
+        },
       },
     },
-    MuiListItemText: {
+    MuiAlert: {
       styleOverrides: {
-        primary: ({ theme }) => ({ // גם כאן נדרש theme
+        root: {
+          borderRadius: 8,
           fontWeight: 600,
-          color: theme.palette.text.primary,
-        }),
-        secondary: ({ theme }) => ({ // וגם כאן
-          color: theme.palette.text.secondary,
-        }),
+          fontSize: '0.95rem',
+        },
       },
     },
   },
@@ -186,147 +181,257 @@ const AdminDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { users, loading, error } = useSelector((state) => state.user);
+  const { users, loading, error, deletionLoading, deletionError } = useSelector((state) => state.user);
+
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [userToDeleteId, setUserToDeleteId] = useState(null);
+  const [userToDeleteName, setUserToDeleteName] = useState("");
+  const [deletionStatusMessage, setDeletionStatusMessage] = useState("");
+  const [deletionStatusSuccess, setDeletionStatusSuccess] = useState(false);
 
   useEffect(() => {
     dispatch(getAllusers());
   }, [dispatch]);
 
-  // פריסת דף מלאה לטעינה, שגיאה וללא משתמשים
-  const FullPageMessage = ({ children }) => (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: theme.palette.background.default,
-        color: theme.palette.text.primary,
-        p: 3,
-        textAlign: 'center',
-      }}
-    >
-      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 6, backgroundColor: theme.palette.background.paper, maxWidth: 500 }}>
-        {children}
-      </Paper>
-    </Box>
-  );
+  const handleDeleteClick = (user) => {
+    setUserToDeleteId(user.id);
+    setUserToDeleteName(user.name);
+    setOpenConfirmDialog(true);
+    setDeletionStatusMessage("");
+  };
 
-  if (loading) {
-    return (
-      <FullPageMessage>
-        <CircularProgress color="primary" size={50} />
-        <Typography variant="h6" sx={{ mt: 3, color: 'text.secondary' }}>
-          טוען משתמשים...
-        </Typography>
-      </FullPageMessage>
-    );
-  }
+  const handleConfirmDelete = async () => {
+    setOpenConfirmDialog(false);
+    setDeletionStatusMessage("");
+    setDeletionStatusSuccess(false);
 
-  if (error) {
-    return (
-      <FullPageMessage>
-        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-          שגיאה בטעינת משתמשים: {error}
-        </Alert>
-        <Typography variant="h6" sx={{ color: 'text.primary' }}>
-          משהו השתבש בטעינת הנתונים.
-        </Typography>
-      </FullPageMessage>
-    );
-  }
+    if (userToDeleteId) {
+      try {
+        const resultAction = await dispatch(DeleteUserById(userToDeleteId));
+        if (DeleteUserById.fulfilled.match(resultAction)) {
+          setDeletionStatusSuccess(true);
+          setDeletionStatusMessage(`User ${userToDeleteName} (ID: ${userToDeleteId}) deleted successfully.`);
+        } else {
+          setDeletionStatusSuccess(false);
+          setDeletionStatusMessage(deletionError || resultAction.payload || `Failed to delete user ${userToDeleteName}.`);
+        }
+      } catch (err) {
+        setDeletionStatusSuccess(false);
+        setDeletionStatusMessage(`Error deleting user: ${err.message}`);
+      }
+    }
+    setUserToDeleteId(null);
+    setUserToDeleteName("");
+  };
 
-  if (!users || users.length === 0) {
-    return (
-      <FullPageMessage>
-        <Alert severity="info" sx={{ width: '100%', mb: 2 }}>
-          אין משתמשים להצגה כרגע.
-        </Alert>
-        <Typography variant="h6" sx={{ color: 'text.primary' }}>
-          כשיהיו משתמשים, הם יופיעו כאן.
-        </Typography>
-      </FullPageMessage>
-    );
-  }
+  const handleCancelDelete = () => {
+    setOpenConfirmDialog(false);
+    setUserToDeleteId(null);
+    setUserToDeleteName("");
+    setDeletionStatusMessage("");
+  };
+
+  const handleViewHistoryClick = (userId) => {
+    navigate(`/LearningHistory/${userId}`);
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box
         sx={{
-          minHeight: '100vh',
-          background: `linear-gradient(135deg, ${theme.palette.darkGrey.dark} 0%, ${theme.palette.background.default} 100%)`,
-          display: 'flex',
+          height: "100%",
+          width: "120%",
+          display: "flex",
           flexDirection: 'column',
-          alignItems: 'center',
-          py: 6,
+          p: 0,
+          overflowY: 'auto',
         }}
       >
-        <Paper
+        <AppBar position="fixed" sx={{
+          background: theme.palette.background.appBar,
+          backdropFilter: `blur(${theme.palette.background.appBarBlur})`,
+          width: '100%',
+          top: 0,
+          left: 0,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+          zIndex: theme.zIndex.appBar,
+        }}>
+          <Toolbar>
+            <SchoolIcon sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} />
+            <Typography variant="h5" color="text.appBar" sx={{ flexGrow: 1, fontWeight: 500 }}>
+              AI Learning Platform (Admin)
+            </Typography>
+          </Toolbar>
+        </AppBar>
+
+        <Box
           sx={{
-            p: { xs: 2, sm: 4 },
-            maxWidth: 900,
-            width: '120%',
-            boxSizing: 'border-box',
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: 3,
-            // boxShadow: '0 8px 30px rgba(0,0,0,0.3)', // הצל לא זמין ב-theme.components.MuiPaper.styleOverrides.root.boxShadow בצורה ישירה
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            maxWidth: '1200px',
+            paddingTop: '80px',
+            paddingBottom: '24px',
+            px: 2,
+            margin: '0 auto', 
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, borderBottom: `1px solid ${theme.palette.divider}`, pb: 2 }}>
-            <AdminPanelSettingsIcon sx={{ fontSize: 48, color: theme.palette.primary.main, mr: 2 }} />
-            <Typography variant="h4" color="text.primary" fontWeight={700}>
-              פאנל ניהול משתמשים
+          <Paper
+            elevation={4}
+            sx={{
+              p: 4,
+              borderRadius: 2,
+              boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.1)",
+              width: '100%', // תן לו למלא את כל הרוחב הזמין בתוך ה-Box
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="h1"
+              align="center"
+              gutterBottom
+              sx={{ mb: 3, color: "primary.main", fontWeight: 700 }}
+            >
+              ניהול משתמשים (פאנל אדמין)
             </Typography>
-          </Box>
 
-          <List sx={{ width: '100%' }}>
-            {users.map((user, index) => (
-              <React.Fragment key={user.id}>
-                <ListItem
-                  secondaryAction={
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      size="medium"
-                      startIcon={<HistoryIcon />}
-                      onClick={() => navigate(`/LearningHistory/${user.id}`)}
-                      sx={{
-                        borderRadius: 20,
-                        px: 3,
-                      }}
-                    >
-                      היסטוריה
-                    </Button>
-                  }
-                  sx={{
-                    py: 2,
-                    alignItems: 'flex-start',
-                  }}
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {user.name}
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        **מזהה:** {user.id} | **טלפון:** {user.phone}
-                      </Typography>
-                    }
-                    sx={{ pr: 2 }}
-                  />
-                </ListItem>
-                {index < users.length - 1 && <Divider component="li" sx={{ my: 1, borderColor: 'rgba(255,255,255,0.08)' }} />}
-              </React.Fragment>
-            ))}
-          </List>
-        </Paper>
+            {deletionStatusMessage && (
+              <Alert
+                severity={deletionStatusSuccess ? "success" : "error"}
+                sx={{ width: "100%", mb: 2, borderRadius: 2 }}
+              >
+                {deletionStatusMessage}
+              </Alert>
+            )}
+            {loading && (
+              <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: 150, width: "100%" }}>
+                <CircularProgress size={50} sx={{ mb: 2 }} />
+                <Typography variant="h6" color="text.secondary">
+                  טוען משתמשים...
+                </Typography>
+              </Box>
+            )}
+
+            {error && (
+              <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+                <Typography variant="body1">
+                  אירעה שגיאה בטעינת משתמשים: {error}
+                </Typography>
+              </Alert>
+            )}
+
+            {!loading && !error && (
+              <List sx={{ bgcolor: "background.paper", borderRadius: 1, width: '100%' }}>
+                {users && users.length > 0 ? (
+                  users.map((user, index) => (
+                    <React.Fragment key={user.id}>
+                      <ListItem
+                        secondaryAction={
+                          <Box sx={{
+                            display: 'flex',
+                            gap: 1,
+                            flexShrink: 0,
+                          }}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              startIcon={<HistoryIcon />}
+                              onClick={() => handleViewHistoryClick(user.id)}
+                              sx={{
+                                minWidth: '90px',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              היסטוריה
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              size="small"
+                              disabled={deletionLoading && userToDeleteId === user.id}
+                              startIcon={deletionLoading && userToDeleteId === user.id ? <CircularProgress size={16} color="inherit" /> : <DeleteForeverIcon />}
+                              onClick={() => handleDeleteClick(user)}
+                              sx={{
+                                minWidth: '90px',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              מחק
+                            </Button>
+                          </Box>
+                        }
+                        sx={{
+                          py: 2,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          px: 2,
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Typography component="span" variant="subtitle1" color="text.primary" sx={{ fontWeight: "bold" }}>
+                              שם: {user.name} (ID: {user.id})
+                            </Typography>
+                          }
+                          secondary={
+                            <Typography sx={{ display: "block", mt: 0.5 }} component="span" variant="body2" color="text.secondary">
+                              טלפון: {user.phone}
+                            </Typography>
+                          }
+                          sx={{ flexGrow: 1, mr: 2 }}
+                        />
+                      </ListItem>
+                      {index < users.length - 1 && (
+                        <Divider component="li" variant="inset" sx={{ ml: 0 }} />
+                      )}
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <Alert severity="info" sx={{ mt: 2, py: 2, width: '100%' }}>
+                    <Typography variant="body1">
+                      אין משתמשים זמינים כרגע.
+                    </Typography>
+                  </Alert>
+                )}
+              </List>
+            )}
+          </Paper>
+        </Box>
       </Box>
+
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCancelDelete}
+        aria-labelledby="confirm-delete-title"
+        aria-describedby="confirm-delete-description"
+      >
+        <DialogTitle id="confirm-delete-title">{"אישור מחיקת משתמש"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-delete-description">
+            האם אתה בטוח שברצונך למחוק את המשתמש "{userToDeleteName}" (ID: {userToDeleteId})?
+            פעולה זו אינה ניתנת לביטול.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary" disabled={deletionLoading}>
+            ביטול
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus disabled={deletionLoading}>
+            {deletionLoading ? <CircularProgress size={20} color="inherit" /> : "מחק"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 };
 
-export default AdminDashboard;
+export default AdminDas

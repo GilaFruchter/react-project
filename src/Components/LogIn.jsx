@@ -11,45 +11,68 @@ import {
   Paper,
   CircularProgress,
   Alert,
-  Fade
+  Fade,
+  AppBar,
+  Toolbar,
+  CssBaseline
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import SchoolIcon from "@mui/icons-material/School";
 import SendIcon from "@mui/icons-material/Send";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux"; // הוחזר הייבוא של useDispatch
-import { getUserById, createNewUser } from "../Redux/thunk"; // הוחזרו הייבואים של ה-thunks
+import { useDispatch } from "react-redux";
+import { getUserById, createNewUser } from "../Redux/thunk";
 
 const theme = createTheme({
   direction: "rtl",
   palette: {
-    primary: { main: "#607D8B" }, // Blue-grey for primary actions/branding
-    secondary: { main: "#B0BEC5" }, // Lighter blue-grey for secondary actions
-    background: { default: "#ECEFF1" }, // Very light grey for the overall background
-    success: { main: "#66BB6A" }, // Green for success messages
-    error: { main: "#EF5350" }, // Red for error messages
+    primary: {
+      main: "#607D8B",
+      light: "#90A4AE",
+      dark: "#455A64",
+    },
+    secondary: { main: "#B0BEC5" },
+    background: {
+      default: "#ECEFF1",
+      appBar: 'rgba(0,0,0,0.1)',
+      appBarBlur: '5px',
+    },
+    success: { main: "#66BB6A" },
+    error: { main: "#EF5350" },
     text: {
-      primary: '#333333', // Dark grey for main text
-      secondary: '#757575', // Medium grey for secondary text
+      primary: '#333333',
+      secondary: '#757575',
+      appBar: '#607D8B',
     }
   },
   typography: {
     fontFamily: 'Varela Round, Alef, sans-serif',
     h4: {
-      fontWeight: 700, // Slightly less bold than 800/900 for a cleaner look
-      letterSpacing: 0.2, // Tighter letter spacing
+      fontWeight: 700,
+      letterSpacing: 0.2,
       fontSize: '2.2rem',
       '@media (max-width:600px)': {
         fontSize: '1.8rem',
       },
+      color: "#607D8B",
+    },
+    h5: {
+      fontWeight: 500,
+      fontSize: '1.5rem',
+      lineHeight: 1.6,
+      '@media (max-width:600px)': {
+        fontSize: '1.2rem',
+      },
     },
     subtitle1: {
-      fontWeight: 400, // Lighter for sub-heading
+      fontWeight: 400,
       fontSize: '1rem',
       lineHeight: 1.6,
+      color: "#78909C",
     },
     body1: {
       fontSize: '0.9rem',
@@ -59,12 +82,12 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8, // Less rounded corners for a modern, clean line
+          borderRadius: 8,
           textTransform: "none",
           fontWeight: 600,
           fontSize: "1rem",
           padding: '10px 24px',
-          boxShadow: "0 2px 8px rgba(0,0,0,0.05)", // Very subtle shadow
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
           transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
           '&:hover': {
             transform: 'translateY(-2px)',
@@ -72,32 +95,31 @@ const theme = createTheme({
           },
         },
         containedPrimary: {
-            background: theme => `linear-gradient(45deg, ${theme.palette.primary.main} 30%, #78909C 90%)`, // Gradient for primary button
-            color: 'white',
-            '&:hover': {
-                background: theme => `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`,
-            }
+          background: theme => `linear-gradient(45deg, ${theme.palette.primary.main} 30%, #78909C 90%)`,
+          '&:hover': {
+            background: theme => `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`,
+          }
         },
         outlinedSecondary: {
-            borderColor: '#90A4AE', // Lighter shade of primary for outline
-            color: theme => theme.palette.text.secondary, // Use secondary text color for outline button text
-            '&:hover': {
-                backgroundColor: 'rgba(144, 164, 174, 0.08)', // Subtle hover background
-                borderColor: '#78909C', // Darker border on hover
-            }
+          borderColor: '#90A4AE',
+          color: theme => theme.palette.primary.main,
+          '&:hover': {
+            backgroundColor: 'rgba(144, 164, 174, 0.08)',
+            borderColor: '#78909C',
+          }
         }
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 12, // Modern, less rounded corners
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)", // Softer, more spread out shadow
+          borderRadius: 12,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
           background: "#FFFFFF",
           transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
           '&:hover': {
-            transform: 'translateY(-5px)', // Less aggressive lift
-            boxShadow: '0 18px 50px rgba(0,0,0,0.12)', // Slightly stronger shadow on hover
+            transform: 'translateY(-5px)',
+            boxShadow: '0 18px 50px rgba(0,0,0,0.12)',
           },
         },
       },
@@ -106,17 +128,17 @@ const theme = createTheme({
       styleOverrides: {
         root: ({ theme }) => ({
           '& .MuiOutlinedInput-root': {
-            borderRadius: 8, // Consistent rounded corners
+            borderRadius: 8,
             transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out',
             '& fieldset': {
-                borderColor: '#E0E0E0',
+              borderColor: '#E0E0E0',
             },
             '&:hover fieldset': {
-              borderColor: '#CFD8DC', // Subtle darker grey on hover
+              borderColor: '#CFD8DC',
             },
             '&.Mui-focused fieldset': {
               borderColor: theme.palette.primary.main,
-              boxShadow: `0 0 0 4px ${theme.palette.primary.light}50`, // Glow from primary light shade
+              boxShadow: `0 0 0 4px ${theme.palette.primary.light}50`,
             },
           },
           '& .MuiInputLabel-root': {
@@ -129,13 +151,31 @@ const theme = createTheme({
       },
     },
     MuiAlert: {
-        styleOverrides: {
-            root: {
-                borderRadius: 8,
-                fontWeight: 600,
-                fontSize: '0.9rem',
-            },
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          fontWeight: 600,
+          fontSize: '0.9rem',
         },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: 'transparent',
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiToolbar: {
+      styleOverrides: {
+        root: {
+          padding: '15px 30px',
+          '@media (max-width:600px)': {
+            padding: '10px 20px',
+          },
+        },
+      },
     },
   },
 });
@@ -146,7 +186,7 @@ const LogIn = () => {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch(); // הוחזר useDispatch
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -156,7 +196,7 @@ const LogIn = () => {
     setLoading(true);
     try {
 
-      const result = await dispatch(getUserById(id)); 
+      const result = await dispatch(getUserById(id));
 
       if (getUserById.fulfilled.match(result)) {
         const user = result.payload;
@@ -167,7 +207,6 @@ const LogIn = () => {
           navigate(`/CheckCategory/${encodeURIComponent(cleanName.replace(/\s+/g, '-'))}/${user.id}`);
         }, 1200);
       } else {
-        // אם ה-thunk נדחה (rejected), תהיה שגיאה
         setSuccess(false);
         setMessage("משתמש לא נמצא. נא להירשם.");
         setTimeout(() => {
@@ -175,10 +214,9 @@ const LogIn = () => {
         }, 1500);
       }
     } catch (error) {
-      // טיפול בשגיאות בלתי צפויות
       setSuccess(false);
       setMessage("שגיאה בכניסה. נסה שוב.");
-      console.error("Login error:", error); // הדפסת שגיאה לקונסול
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
@@ -186,6 +224,7 @@ const LogIn = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Box
         sx={{
           minHeight: "100vh",
@@ -193,119 +232,139 @@ const LogIn = () => {
           position: 'fixed',
           top: 0,
           left: 0,
-          background: theme => `linear-gradient(135deg, ${theme.palette.background.default} 0%, #F5F5F5 100%)`, // Very subtle grey-white gradient
+          background: theme => `linear-gradient(135deg, ${theme.palette.background.default} 0%, #F5F5F5 100%)`,
           display: "flex",
+          flexDirection: 'column',
           alignItems: "center",
           justifyContent: "center",
           p: 2,
           overflow: 'hidden',
         }}
       >
-        <Fade in timeout={800}>
-          <Paper
-            elevation={8}
-            sx={{
-              p: { xs: 3, sm: 5 },
-              width: 400,
-              maxWidth: "95vw",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Avatar
+        <AppBar position="static" sx={{
+          background: theme.palette.background.appBar,
+          backdropFilter: `blur(${theme.palette.background.appBarBlur})`,
+          width: '100%',
+          top: 0,
+          left: 0,
+          position: 'absolute',
+        }}>
+          <Toolbar>
+            <SchoolIcon sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} />
+            <Typography variant="h5" color="text.appBar" sx={{ flexGrow: 1, fontWeight: 500 }}>
+              AI Learning Platform
+            </Typography>
+          </Toolbar>
+        </AppBar>
+
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <Fade in timeout={800}>
+            <Paper
+              elevation={8}
               sx={{
-                bgcolor: "primary.main",
-                width: 64, 
-                height: 64,
-                mb: 1,
-                boxShadow: "0 6px 20px rgba(96, 125, 139, 0.3)", // Shadow based on primary color
+                p: { xs: 3, sm: 5 },
+                width: 400,
+                maxWidth: "95vw",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
+                mt: { xs: 8, sm: 10 },
               }}
             >
-              <LockOutlinedIcon fontSize="large" />
-            </Avatar>
-            <Typography variant="h4" color="text.primary" gutterBottom>
-              התחברות למערכת
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary" mb={2}>
-              הכנס/י תעודת זהות כדי להמשיך
-            </Typography>
-            {message && (
-              <Alert
-                severity={success ? "success" : "error"}
-                sx={{ width: "100%", mb: 1, fontWeight: 600, fontSize: "0.95rem" }}
-              >
-                {message}
-              </Alert>
-            )}
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-              <TextField
-                label="תעודת זהות"
-                variant="outlined"
-                fullWidth
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                type={showId ? "text" : "password"}
-                autoFocus
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowId((prev) => !prev)}
-                        edge="end"
-                      >
-                        {showId ? <VisibilityOff color="action" /> : <Visibility color="action" />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
+              <Avatar
                 sx={{
-                  mb: 3,
-                  background: "#FBFBFB", // רקע בהיר יותר לשדה הקלט
-                  borderRadius: 8, // עקביות עם פינות מעוגלות
-                  boxShadow: "0 1px 6px rgba(0,0,0,0.03)", // צל עדין מאוד
+                  bgcolor: "primary.main",
+                  width: 64,
+                  height: 64,
+                  mb: 1,
+                  boxShadow: "0 6px 20px rgba(96, 125, 139, 0.3)",
                 }}
-              />
-              <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
-                <Button
+              >
+                <LockOutlinedIcon fontSize="large" />
+              </Avatar>
+              <Typography variant="h4" color="text.primary" gutterBottom>
+                התחברות למערכת
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary" mb={2}>
+                הכנס/י סיסמה כדי להמשיך
+              </Typography>
+              {message && (
+                <Alert
+                  severity={success ? "success" : "error"}
+                  sx={{ width: "100%", mb: 1, fontWeight: 600, fontSize: "0.95rem" }}
+                >
+                  {message}
+                </Alert>
+              )}
+              <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+                <TextField
+                  label="Password:"
                   variant="outlined"
-                  color="secondary" // Uses new secondary palette color
-                  startIcon={<PersonAddAlt1Icon />}
-                  onClick={() => navigate("/CheckCategory/guest/000")}
-                  sx={{
-                    px: 3,
-                    fontWeight: 700,
-                    minWidth: { xs: '140px', sm: 'auto' },
-                    mb: { xs: 2, sm: 0 },
+                  fullWidth
+                  value={id}
+                  onChange={(e) => setId(e.target.value)}
+                  type={showId ? "text" : "password"}
+                  autoFocus
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowId((prev) => !prev)}
+                          edge="end"
+                        >
+                          {showId ? <VisibilityOff color="action" /> : <Visibility color="action" />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
                   }}
-                >
-                  כניסת אורח
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  disabled={!id.trim() || loading}
-                  endIcon={
-                    loading ? (
-                      <CircularProgress size={22} color="inherit" />
-                    ) : (
-                      <SendIcon />
-                    )
-                  }
                   sx={{
-                    px: 3,
-                    fontWeight: 700,
-                    minWidth: { xs: '140px', sm: 'auto' },
+                    mb: 3,
+                    background: "#FBFBFB",
+                    borderRadius: 8,
+                    boxShadow: "0 1px 6px rgba(0,0,0,0.03)",
                   }}
-                >
-                  התחבר
-                </Button>
-              </Stack>
-            </Box>
-          </Paper>
-        </Fade>
+                />
+                <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<PersonAddAlt1Icon />}
+                    onClick={() => navigate("/CheckCategory/guest/000")}
+                    sx={{
+                      px: 3,
+                      fontWeight: 700,
+                      minWidth: { xs: '140px', sm: 'auto' },
+                      mb: { xs: 2, sm: 0 },
+                    }}
+                  >
+                    כניסת אורח
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={!id.trim() || loading}
+                    endIcon={
+                      loading ? (
+                        <CircularProgress size={22} color="inherit" />
+                      ) : (
+                        <SendIcon />
+                      )
+                    }
+                    sx={{
+                      px: 3,
+                      fontWeight: 700,
+                      minWidth: { xs: '140px', sm: 'auto' },
+                    }}
+                  >
+                    התחבר
+                  </Button>
+                </Stack>
+              </Box>
+            </Paper>
+          </Fade>
+        </Box>
       </Box>
     </ThemeProvider>
   );

@@ -132,3 +132,19 @@ export const GetPromptById=createAsyncThunk(
     }
   }
 );
+export const DeleteUserById = createAsyncThunk(
+  "users/DeleteUserById",
+  async (userId, thunkAPI) => {
+    try {
+      const response = await fetch(`http://localhost:5032/api/users/${userId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+      return userId; 
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);

@@ -135,11 +135,11 @@ const Home = () => {
           display: 'flex', 
           flexDirection: 'column', 
           overflow: 'hidden', 
-        }} 
+        }}
       > 
         <AppBar position="static" sx={{ background: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(5px)' }}> 
           <Toolbar> 
-            <SchoolIcon sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} /> 
+            <SchoolIcon sx={{ fontSize: 60, color: theme.palette.primary.main, mr: 2 }} /> 
             <Typography variant="h5" color="text.primary" sx={{ flexGrow: 1, fontWeight: 500 }}> 
               AI Learning Platform 
             </Typography> 
