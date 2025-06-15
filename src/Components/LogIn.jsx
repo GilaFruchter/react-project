@@ -20,43 +20,122 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { getUserById, createNewUser } from "../Redux/thunk";
+import { useDispatch } from "react-redux"; // הוחזר הייבוא של useDispatch
+import { getUserById, createNewUser } from "../Redux/thunk"; // הוחזרו הייבואים של ה-thunks
 
 const theme = createTheme({
   direction: "rtl",
   palette: {
-    primary: { main: "#1565c0" },
-    secondary: { main: "#00bcd4" },
-    background: { default: "#f4f8fb" },
-    success: { main: "#43a047" },
-    error: { main: "#e53935" },
+    primary: { main: "#607D8B" }, // Blue-grey for primary actions/branding
+    secondary: { main: "#B0BEC5" }, // Lighter blue-grey for secondary actions
+    background: { default: "#ECEFF1" }, // Very light grey for the overall background
+    success: { main: "#66BB6A" }, // Green for success messages
+    error: { main: "#EF5350" }, // Red for error messages
+    text: {
+      primary: '#333333', // Dark grey for main text
+      secondary: '#757575', // Medium grey for secondary text
+    }
   },
   typography: {
     fontFamily: 'Varela Round, Alef, sans-serif',
-    h4: { fontWeight: 900, letterSpacing: 1 },
-    subtitle1: { fontWeight: 500 },
+    h4: {
+      fontWeight: 700, // Slightly less bold than 800/900 for a cleaner look
+      letterSpacing: 0.2, // Tighter letter spacing
+      fontSize: '2.2rem',
+      '@media (max-width:600px)': {
+        fontSize: '1.8rem',
+      },
+    },
+    subtitle1: {
+      fontWeight: 400, // Lighter for sub-heading
+      fontSize: '1rem',
+      lineHeight: 1.6,
+    },
+    body1: {
+      fontSize: '0.9rem',
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 30,
+          borderRadius: 8, // Less rounded corners for a modern, clean line
           textTransform: "none",
-          fontWeight: 700,
-          fontSize: "1.1rem",
-          boxShadow: "0 2px 12px 0 rgba(21,101,192,0.10)",
+          fontWeight: 600,
+          fontSize: "1rem",
+          padding: '10px 24px',
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)", // Very subtle shadow
+          transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+          },
         },
+        containedPrimary: {
+            background: theme => `linear-gradient(45deg, ${theme.palette.primary.main} 30%, #78909C 90%)`, // Gradient for primary button
+            color: 'white',
+            '&:hover': {
+                background: theme => `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.main} 90%)`,
+            }
+        },
+        outlinedSecondary: {
+            borderColor: '#90A4AE', // Lighter shade of primary for outline
+            color: theme => theme.palette.text.secondary, // Use secondary text color for outline button text
+            '&:hover': {
+                backgroundColor: 'rgba(144, 164, 174, 0.08)', // Subtle hover background
+                borderColor: '#78909C', // Darker border on hover
+            }
+        }
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 28,
-          boxShadow: "0 8px 32px 0 rgba(21,101,192,0.13)",
-          background: "rgba(255,255,255,0.95)",
+          borderRadius: 12, // Modern, less rounded corners
+          boxShadow: "0 10px 30px rgba(0,0,0,0.08)", // Softer, more spread out shadow
+          background: "#FFFFFF",
+          transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-5px)', // Less aggressive lift
+            boxShadow: '0 18px 50px rgba(0,0,0,0.12)', // Slightly stronger shadow on hover
+          },
         },
       },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8, // Consistent rounded corners
+            transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out',
+            '& fieldset': {
+                borderColor: '#E0E0E0',
+            },
+            '&:hover fieldset': {
+              borderColor: '#CFD8DC', // Subtle darker grey on hover
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette.primary.main,
+              boxShadow: `0 0 0 4px ${theme.palette.primary.light}50`, // Glow from primary light shade
+            },
+          },
+          '& .MuiInputLabel-root': {
+            color: theme.palette.text.secondary,
+          },
+          '& .MuiInputBase-input': {
+            color: theme.palette.text.primary,
+          },
+        }),
+      },
+    },
+    MuiAlert: {
+        styleOverrides: {
+            root: {
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: '0.9rem',
+            },
+        },
     },
   },
 });
@@ -67,7 +146,7 @@ const LogIn = () => {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // הוחזר useDispatch
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -76,16 +155,19 @@ const LogIn = () => {
     setSuccess(false);
     setLoading(true);
     try {
-      const result = await dispatch(getUserById(id));
+
+      const result = await dispatch(getUserById(id)); 
+
       if (getUserById.fulfilled.match(result)) {
         const user = result.payload;
-        const cleanName = user?.name ? user.name.trim() : "User";
+        const cleanName = user?.name ? user.name.trim() : "משתמש";
         setSuccess(true);
         setMessage(`ברוך הבא, ${cleanName}!`);
         setTimeout(() => {
-         navigate(`/CheckCategory/${user.name.replace(/^\s+|\s+$/g, '').replace(/\s+/g, '-')}/${user.id}`);
+          navigate(`/CheckCategory/${encodeURIComponent(cleanName.replace(/\s+/g, '-'))}/${user.id}`);
         }, 1200);
       } else {
+        // אם ה-thunk נדחה (rejected), תהיה שגיאה
         setSuccess(false);
         setMessage("משתמש לא נמצא. נא להירשם.");
         setTimeout(() => {
@@ -93,8 +175,10 @@ const LogIn = () => {
         }, 1500);
       }
     } catch (error) {
+      // טיפול בשגיאות בלתי צפויות
       setSuccess(false);
       setMessage("שגיאה בכניסה. נסה שוב.");
+      console.error("Login error:", error); // הדפסת שגיאה לקונסול
     } finally {
       setLoading(false);
     }
@@ -105,10 +189,16 @@ const LogIn = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          backgroundRepeat: "repeat",
+          width: "100vw",
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          background: theme => `linear-gradient(135deg, ${theme.palette.background.default} 0%, #F5F5F5 100%)`, // Very subtle grey-white gradient
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          p: 2,
+          overflow: 'hidden',
         }}
       >
         <Fade in timeout={800}>
@@ -122,21 +212,20 @@ const LogIn = () => {
               flexDirection: "column",
               alignItems: "center",
               gap: 2,
-              backdropFilter: "blur(2px)",
             }}
           >
             <Avatar
               sx={{
                 bgcolor: "primary.main",
-                width: 70,
-                height: 70,
+                width: 64, 
+                height: 64,
                 mb: 1,
-                boxShadow: "0 4px 16px 0 rgba(21,101,192,0.18)",
+                boxShadow: "0 6px 20px rgba(96, 125, 139, 0.3)", // Shadow based on primary color
               }}
             >
               <LockOutlinedIcon fontSize="large" />
             </Avatar>
-            <Typography variant="h4" color="primary" gutterBottom>
+            <Typography variant="h4" color="text.primary" gutterBottom>
               התחברות למערכת
             </Typography>
             <Typography variant="subtitle1" color="text.secondary" mb={2}>
@@ -145,7 +234,7 @@ const LogIn = () => {
             {message && (
               <Alert
                 severity={success ? "success" : "error"}
-                sx={{ width: "100%", mb: 1, fontWeight: 600, fontSize: "1rem" }}
+                sx={{ width: "100%", mb: 1, fontWeight: 600, fontSize: "0.95rem" }}
               >
                 {message}
               </Alert>
@@ -162,34 +251,33 @@ const LogIn = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowId((prev) => !prev)}>
-                        {showId ? <VisibilityOff /> : <Visibility />}
+                      <IconButton
+                        onClick={() => setShowId((prev) => !prev)}
+                        edge="end"
+                      >
+                        {showId ? <VisibilityOff color="action" /> : <Visibility color="action" />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
                 sx={{
                   mb: 3,
-                  background: "#f7fafc",
-                  borderRadius: 2,
-                  boxShadow: "0 1px 4px 0 rgba(21,101,192,0.06)",
+                  background: "#FBFBFB", // רקע בהיר יותר לשדה הקלט
+                  borderRadius: 8, // עקביות עם פינות מעוגלות
+                  boxShadow: "0 1px 6px rgba(0,0,0,0.03)", // צל עדין מאוד
                 }}
               />
-              <Stack direction="row" spacing={2} justifyContent="center">
+              <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
                 <Button
                   variant="outlined"
-                  color="secondary"
+                  color="secondary" // Uses new secondary palette color
                   startIcon={<PersonAddAlt1Icon />}
                   onClick={() => navigate("/CheckCategory/guest/000")}
                   sx={{
                     px: 3,
                     fontWeight: 700,
-                    border: "2px solid #00bcd4",
-                    background: "rgba(0,188,212,0.07)",
-                    "&:hover": {
-                      background: "#e0f7fa",
-                      borderColor: "#00bcd4",
-                    },
+                    minWidth: { xs: '140px', sm: 'auto' },
+                    mb: { xs: 2, sm: 0 },
                   }}
                 >
                   כניסת אורח
@@ -209,20 +297,7 @@ const LogIn = () => {
                   sx={{
                     px: 3,
                     fontWeight: 700,
-                    border: "2px solid #1565c0",
-                    background: "linear-gradient(90deg, #1976d2 60%, #00bcd4 100%)",
-                    color: "#fff",
-                    boxShadow: "0 2px 8px 0 rgba(21,101,192,0.13)",
-                    transition: "all 0.2s",
-                    "&:hover": {
-                      background: "linear-gradient(90deg, #1565c0 80%, #00bcd4 100%)",
-                    },
-                    "&.Mui-disabled": {
-                      background: "#e3f0ff",
-                      color: "#1976d2",
-                      border: "2px solid #1976d2",
-                      opacity: 0.7,
-                    },
+                    minWidth: { xs: '140px', sm: 'auto' },
                   }}
                 >
                   התחבר

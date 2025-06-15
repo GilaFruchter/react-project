@@ -1,193 +1,219 @@
 import React from "react";
-import { Button, Typography, Stack, AppBar, Toolbar, Box, createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import SchoolIcon from "@mui/icons-material/School";
-import { useNavigate } from "react-router-dom";
+import { 
+  Button, 
+  Typography, 
+  Stack, 
+  AppBar, 
+  Toolbar, 
+  Box, 
+  createTheme, 
+  ThemeProvider, 
+  CssBaseline 
+} from "@mui/material"; 
+import LockOpenIcon from "@mui/icons-material/LockOpen"; 
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"; 
+import SchoolIcon from "@mui/icons-material/School"; 
+import { useNavigate } from "react-router-dom"; 
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#607D8B', // אפור-כחול עדין
-      light: '#90A4AE',
-      dark: '#455A64',
-    },
-    secondary: {
-      main: '#81C784', // ירוק בהיר ומרגיע
-      light: '#A5D6A7',
-      dark: '#66BB6A',
-    },
-    text: {
-      primary: '#424242', // אפור כהה רך לטקסט ראשי
-      secondary: '#757575', // אפור בינוני לטקסט משני
-    },
-    background: {
-      default: '#ECEFF1', // אפור בהיר מאוד (כמעט לבן)
-      paper: '#FFFFFF',
-    },
-  },
-  typography: {
-    fontFamily: 'Heebo, sans-serif',
-    h3: {
-      fontWeight: 700, // מעט פחות דומיננטי
-      fontSize: '3.5rem',
-      letterSpacing: -1, // פחות דחיס
-      lineHeight: 1.2,
-      '@media (max-width:600px)': {
-        fontSize: '2.5rem',
+const theme = createTheme({ 
+  direction: "ltr", 
+  palette: { 
+    primary: { 
+      main: '#4db6ac', // Teal
+      dark: '#00897b',
+    }, 
+    secondary: { 
+      main: '#7986cb', // Indigo
+      light: '#9fa8da',
+    }, 
+    text: { 
+      primary: '#ffffff', // White
+      secondary: '#cfd8dc', // Light grey for subtle text
+    }, 
+    background: { 
+      default: '#263238', // Dark blue-grey (Deep Space)
+      paper: '#37474F', // Slightly lighter for elements (Dark Slate)
+      accent: '#546E7A', // Blue-grey (Requested color)
+    }, 
+  }, 
+  typography: { 
+    fontFamily: 'Heebo, sans-serif', 
+    h3: { 
+      fontWeight: 700, 
+      fontSize: '3.8rem', 
+      letterSpacing: -1.5, 
+      lineHeight: 1.1,
+      '@media (max-width:960px)': { 
+        fontSize: '3rem',
       },
-    },
-    h4: {
-      fontWeight: 600,
-      fontSize: '2rem',
+      '@media (max-width:600px)': { 
+        fontSize: '2.5rem', 
+      }, 
+    }, 
+    h5: { 
+      fontWeight: 400, 
+      fontSize: '1.5rem', 
+      lineHeight: 1.6, 
       '@media (max-width:600px)': {
-        fontSize: '1.6rem',
+        fontSize: '1.2rem',
       },
-    },
-    h5: {
-      fontWeight: 500,
-      fontSize: '1.5rem',
-    },
-    body1: {
-      fontSize: '1rem',
-    }
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 10, // מעט פחות עגול
-          textTransform: "none",
-          fontWeight: 600, // פחות בולד
-          fontSize: '1.2rem',
-          padding: '12px 35px', // ריווח פנימי מעט פחות
-          transition: 'all 0.2s ease-in-out', // מעבר מהיר יותר
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)', // צל קבוע עדין מאוד
-          '&:hover': {
-            transform: 'translateY(-2px)', // אפקט ריחוף עדין יותר
-            boxShadow: '0 6px 16px rgba(0, 0, 0, 0.08)', // צל מעט בולט בריחוף
-          },
-        },
+    }, 
+  }, 
+  components: { 
+    MuiButton: { 
+      styleOverrides: { 
+        root: { 
+          borderRadius: 30, 
+          padding: '14px 36px', 
+          fontWeight: 600, 
+          fontSize: '1.15rem', 
+          textTransform: 'none', 
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease', 
+          boxShadow: '0 4px 15px rgba(0,0,0,0.2)', 
+          '&:hover': { 
+            transform: 'scale(1.03) translateY(-2px)', 
+            boxShadow: '0 8px 25px rgba(0,0,0,0.3)', 
+          }, 
+        }, 
         containedPrimary: {
-          backgroundColor: '#607D8B', // צבע אחיד רך יותר
-          color: '#fff',
+          backgroundColor: '#4db6ac',
           '&:hover': {
-            backgroundColor: '#78909C', // גוון מעט בהיר יותר במעבר
+            backgroundColor: '#00897b',
           },
         },
-        outlinedPrimary: {
-          borderColor: '#607D8B',
-          color: '#607D8B',
-          borderWidth: 1, // מסגרת דקה יותר
-          '&:hover': {
-            backgroundColor: 'rgba(96, 125, 139, 0.05)', // רקע שקוף יותר במעבר
-            borderColor: '#607D8B',
-          },
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          background: 'rgba(255, 255, 255, 0.9)', // שקיפות עדינה
-          backdropFilter: 'blur(6px)', // טשטוש עדין
-          boxShadow: '0 1px 8px rgba(0, 0, 0, 0.03)', // צל קל מאוד
-        },
-      },
-    },
+        outlinedSecondary: { 
+            borderColor: '#7986cb', 
+            color: '#7986cb', 
+            '&:hover': {
+                backgroundColor: 'rgba(121, 134, 203, 0.1)', 
+                borderColor: '#7986cb',
+            },
+        }
+      }, 
+    }, 
+    MuiAppBar: { 
+      styleOverrides: { 
+        root: { 
+          background: 'transparent', 
+          boxShadow: 'none', 
+        }, 
+      }, 
+    }, 
     MuiToolbar: {
-      styleOverrides: {
-        root: {
-          paddingLeft: '28px',
-          paddingRight: '28px',
-          '@media (max-width:600px)': {
-            paddingLeft: '18px',
-            paddingRight: '18px',
-          },
+        styleOverrides: {
+            root: {
+                padding: '15px 30px', 
+                '@media (max-width:600px)': {
+                    padding: '10px 20px',
+                },
+            },
         },
-      },
     },
-  },
-});
+  }, 
+}); 
 
-const Home = () => {
-  const navigate = useNavigate();
+const Home = () => { 
+  const navigate = useNavigate(); 
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: 'linear-gradient(135deg, #F9FBE7 0%, #E8F5E9 100%)', // גרדיאנט פסטלי עדין מאוד
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <AppBar position="sticky" color="transparent" elevation={0} sx={{ top: 0, zIndex: 1100 }}>
-          <Toolbar>
-            <SchoolIcon color="primary" sx={{ fontSize: 40, mr: 1.5 }} />
-            <Typography
-              variant="h5" // הקטנתי מעט את כותרת הלוגו
-              color="primary"
-              sx={{ flexGrow: 1, fontWeight: 600 }}
-            >
-              AI Learning Platform
-            </Typography>
-          </Toolbar>
-        </AppBar>
+  return ( 
+    <ThemeProvider theme={theme}> 
+      <CssBaseline /> 
+      <Box 
+        sx={{ 
+          minHeight: '100vh', 
+          width: '100vw', 
+          position: 'fixed', 
+          top: 0,
+          left: 0,
+          background: `
+            linear-gradient(160deg, ${theme.palette.background.default} 0%, ${theme.palette.background.accent} 70%, #607D8B 100%),
+            radial-gradient(circle at 15% 85%, rgba(77, 182, 172, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 85% 15%, rgba(121, 134, 203, 0.15) 0%, transparent 50%)
+          `, 
+          backgroundSize: 'cover',
+          backgroundAttachment: 'fixed',
+          display: 'flex', 
+          flexDirection: 'column', 
+          overflow: 'hidden', 
+        }} 
+      > 
+        <AppBar position="static" sx={{ background: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(5px)' }}> 
+          <Toolbar> 
+            <SchoolIcon sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 2 }} /> 
+            <Typography variant="h5" color="text.primary" sx={{ flexGrow: 1, fontWeight: 500 }}> 
+              AI Learning Platform 
+            </Typography> 
+          </Toolbar> 
+        </AppBar> 
 
-        <Box
-          sx={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            p: { xs: 3, sm: 5 },
-            width: '100%',
-            maxWidth: 700, // צמצום רוחב מרבי לתוכן המרכזי
-            margin: '0 auto',
-          }}
-        >
-          <Typography
-            variant="h3"
-            color="text.primary"
-            fontWeight={700}
-            gutterBottom
-            sx={{
-              mb: 5, // ריווח תחתון סטנדרטי יותר
-              letterSpacing: -1,
-              textAlign: "center",
-              textShadow: '1px 1px 3px rgba(0,0,0,0.03)', // צל טקסט עדין מאוד
-            }}
-          >
-            Welcome to the <br /> **AI Learning Platform**
-          </Typography>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={4}> {/* ריווח מעט קטן יותר */}
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<LockOpenIcon />}
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="large"
-              startIcon={<AdminPanelSettingsIcon />}
-              onClick={() => navigate("/AdminDashboard")}
-            >
-              Admin
-            </Button>
-          </Stack>
-        </Box>
-      </Box>
-    </ThemeProvider>
-  );
-};
+        <Box 
+          sx={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            textAlign: 'center', 
+            px: { xs: 3, md: 8 }, 
+            py: { xs: 6, md: 10 }, 
+            color: 'white', 
+            background: 'transparent', 
+            maxWidth: '900px', 
+            margin: '0 auto', 
+          }} 
+        > 
+          <Typography 
+            variant="h3" 
+            gutterBottom 
+            sx={{ 
+              mb: 4, 
+              color: theme.palette.text.primary, 
+              textShadow: '0 2px 8px rgba(0,0,0,0.4)', 
+              animation: 'fadeInUp 1.5s ease-out', 
+              '@keyframes fadeInUp': { 
+                'from': { opacity: 0, transform: 'translateY(40px)' }, 
+                'to': { opacity: 1, transform: 'translateY(0)' }, 
+              }, 
+            }} 
+          > 
+            Welcome to <br /> the AI Learning Platform 
+          </Typography> 
+
+          <Typography variant="h5" sx={{ mb: 5, maxWidth: 650, color: theme.palette.text.secondary }}> 
+            Personalized learning powered by AI – accessible, engaging, and tailored for your success. 
+          </Typography> 
+
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={3} sx={{ width: '100%', justifyContent: 'center' }}> 
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<LockOpenIcon />} 
+              onClick={() => navigate("/login")} 
+            > 
+              Login 
+            </Button> 
+            <Button 
+              variant="outlined" 
+              color="secondary" 
+              startIcon={<AdminPanelSettingsIcon />} 
+              onClick={() => navigate("/AdminDashboard")} 
+              sx={{ 
+                borderColor: theme.palette.secondary.main, 
+                color: theme.palette.secondary.main, 
+                '&:hover': { 
+                  backgroundColor: 'rgba(121, 134, 203, 0.1)', 
+                  borderColor: theme.palette.secondary.light, 
+                  color: theme.palette.secondary.light, 
+                }, 
+              }} 
+            > 
+              Admin 
+            </Button> 
+          </Stack> 
+        </Box> 
+      </Box> 
+    </ThemeProvider> 
+  ); 
+}; 
 
 export default Home;

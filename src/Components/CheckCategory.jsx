@@ -182,19 +182,19 @@ const CheckCategory = () => {
   const categories =
     categoriesList && categoriesList.length > 0
       ? categoriesList.map((cat) => ({
-          id: cat.id,
-          name: cat.name,
-        }))
+        id: cat.id,
+        name: cat.name,
+      }))
       : [];
 
   const subsCategoryData =
     subsCategoryList && subsCategoryList.length > 0 && selectedCategory
       ? subsCategoryList
-          .filter((sub) => sub.categoryId === Number(selectedCategory))
-          .map((sub) => ({
-            id: sub.id,
-            name: sub.name,
-          }))
+        .filter((sub) => sub.categoryId === Number(selectedCategory))
+        .map((sub) => ({
+          id: sub.id,
+          name: sub.name,
+        }))
       : [];
 
   const handleSubmitPrompt = async () => {
@@ -233,7 +233,6 @@ const CheckCategory = () => {
         <Box
           sx={{
             minHeight: "100vh",
-            background: 'linear-gradient(135deg, #F0F2F5 0%, #E0E3E8 100%)',
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -284,6 +283,7 @@ const CheckCategory = () => {
             )}
 
             <FormControl fullWidth sx={{ mb: 1 }}>
+
               <InputLabel id="category-label">Category</InputLabel>
               <Select
                 labelId="category-label"
@@ -298,7 +298,6 @@ const CheckCategory = () => {
                 ))}
               </Select>
             </FormControl>
-
             <FormControl fullWidth sx={{ mb: 1 }}>
               <InputLabel id="sub-category-label">Sub-Category</InputLabel>
               <Select

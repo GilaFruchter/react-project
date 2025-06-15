@@ -59,7 +59,7 @@ const SignUp = () => {
     event.preventDefault();
     setMessage('');
     if (!id || !firstName.trim() || !phone.trim()) {
-      setMessage('יש למלא את כל השדות');
+      setMessage('you need to fill all the filed!');
       return;
     }
     const customerData = {
@@ -70,14 +70,14 @@ const SignUp = () => {
     try {
       const resultAction = await dispatch(createNewUser(customerData));
       if (createNewUser.fulfilled.match(resultAction)) {
-        setMessage('נרשמת בהצלחה!');
+        setMessage('you sign up by succefully');
         await new Promise(res => setTimeout(res, 1000));
         navigate(`/CheckCategory/${firstName}/${id}`);
       } else {
-        setMessage('הרשמה נכשלה: ' + (resultAction.error?.message || ''));
+        setMessage('the sign up is faild: ' + (resultAction.error?.message || ''));
       }
     } catch (error) {
-      setMessage('שגיאה: ' + error.message);
+      setMessage('error: ' + error.message);
     }
   };
 
@@ -107,10 +107,10 @@ const SignUp = () => {
             <PersonAddAlt1Icon fontSize="large" />
           </Avatar>
           <Typography variant="h4" color="primary" fontWeight={700} gutterBottom>
-            הרשמה
+            Sign Up
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" mb={2}>
-            מלא את פרטיך להרשמה
+            Insert your details to sign up
           </Typography>
           {message && (
             <Typography variant="body2" color={message.includes('הצלחה') ? "success.main" : "error"} align="center" mb={2}>
@@ -119,7 +119,7 @@ const SignUp = () => {
           )}
           <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
             <TextField
-              label="תעודת זהות"
+              label="Id"
               variant="outlined"
               fullWidth
               value={id || ''}
@@ -127,7 +127,7 @@ const SignUp = () => {
               sx={{ mb: 3, background: "#f7fafc", borderRadius: 2 }}
             />
             <TextField
-              label="שם פרטי"
+              label="Name:"
               variant="outlined"
               fullWidth
               value={firstName}
@@ -136,7 +136,7 @@ const SignUp = () => {
               required
             />
             <TextField
-              label="מספר טלפון"
+              label="Phone Num:"
               variant="outlined"
               fullWidth
               value={phone}
@@ -165,7 +165,7 @@ const SignUp = () => {
                   }
                 }}
               >
-                הרשמה
+                Sign Up
               </Button>
             </Stack>
           </Box>
